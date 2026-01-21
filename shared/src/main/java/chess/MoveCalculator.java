@@ -96,6 +96,20 @@ public class MoveCalculator {
             moves.add(new ChessMove(position, knight_move, null));
         }
     }
+
+    private void pawn_helper(Collection<ChessMove> moves, int specific_row, int specific_col) {
+            var pawn_move = new ChessPosition(specific_row, specific_col);
+            if (out_of_bounds(pawn_move)) {
+                return;
+            }
+            if (board.getPiece(pawn_move) != null && board.getPiece(pawn_move).getTeamColor() != piece.getTeamColor()) {
+                if (nextRow == 8 || nextRow == 1) {
+                    PromotionMoves(moves, pawn_move);
+                } else {
+                    moves.add(new ChessMove(position, pawn_move, null));
+                }
+            }
+    }
     private void pawnMoves(Collection<ChessMove> moves) {
         // move forward
         var forward = new ChessPosition(row + direction, col);
@@ -119,29 +133,9 @@ public class MoveCalculator {
             }
         }
         // attacking diagonal
-        // check left
-        var diag_left = new ChessPosition(row + direction, col -1);
-        if (col > 1) {
-            if (board.getPiece(diag_left) != null && board.getPiece(diag_left).getTeamColor() != piece.getTeamColor()) {
-                if (nextRow == 8 || nextRow == 1) {
-                    PromotionMoves(moves, diag_left);
-                } else {
-                    moves.add(new ChessMove(position, diag_left, null));
-                }
-            }
-        }
-        //check right
-        var diag_right = new ChessPosition(row + direction, col +1);
-        if (col < 8) {
-            // if piece is opposite color
-            if (board.getPiece(diag_right) != null && board.getPiece(diag_right).getTeamColor() != piece.getTeamColor()) {
-                if (nextRow == 8 || nextRow == 1) {
-                    PromotionMoves(moves, diag_right);
-                } else {
-                    moves.add(new ChessMove(position, diag_right, null));
-                }
-            }
-        }
+        pawn_helper(moves, row + direction, col + 1);
+        pawn_helper(moves, row + direction, col - 1);
+
     }
     private void rookMoves(Collection<ChessMove> moves) {
         //up
