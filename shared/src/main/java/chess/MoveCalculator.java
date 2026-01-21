@@ -80,7 +80,7 @@ public class MoveCalculator {
             }
             if (board.getPiece(new_position) != null) {
                 if (board.getPiece(new_position).getTeamColor() != piece.getTeamColor()) {
-                    moves.add(new ChessMove( position, new_position, null));
+                    moves.add(new ChessMove(position, new_position, null));
                 }
                 return;
             }
@@ -91,16 +91,21 @@ public class MoveCalculator {
             //update so we don't just check the same square over and over
             r += specific_row;
             c += specific_col;
-
         }
     }
 
     private void knight_helper(Collection<ChessMove> moves, int specific_row, int specific_col) {
-        var knightmove = new ChessPosition(specific_row, specific_col);
-        if (board.getPiece(knightmove) != null && board.getPiece(knightmove).getTeamColor() != piece.getTeamColor()) {
+        var knight_move = new ChessPosition(specific_row, specific_col);
+        if (out_of_bounds(knight_move)) {
+            return;
+        }
+        if (board.getPiece(knight_move) == null) {
+            moves.add(new ChessMove(position, knight_move, null));
+        }
+        if (board.getPiece(knight_move) != null && board.getPiece(knight_move).getTeamColor() != piece.getTeamColor()) {
+            moves.add(new ChessMove(position, knight_move, null));
         }
     }
-
     private void pawnMoves(Collection<ChessMove> moves) {
         // move forward
         var forward = new ChessPosition(row + direction, col);
@@ -206,9 +211,13 @@ public class MoveCalculator {
     }
     private void knightMoves(Collection<ChessMove> moves) {
         // knight move forward 2 and then left or right
-        var upright = new ChessPosition(row + 2, col + 1);
-        var upleft = new ChessPosition(row + 2, col - 1);
-        var downright = new ChessPosition( row - 2, col +1);
-        var downleft = new ChessPosition(row+2, col - 1);
+        knight_helper(moves, row + 2, col + 1);
+        knight_helper(moves, row + 2, col - 1);
+        knight_helper(moves, row - 2, col + 1);
+        knight_helper(moves, row - 2, col - 1);
+        knight_helper(moves, row + 1, col + 2);
+        knight_helper(moves, row + 1, col - 2);
+        knight_helper(moves, row - 1, col + 2);
+        knight_helper(moves, row - 1, col - 2);
     }
     }
