@@ -28,7 +28,6 @@ public class MoveCalculator {
         this.nextRow = row + direction;
     }
 
-
     //create moves arraylist
     public Collection<ChessMove> calculateMoves() {
         Collection<ChessMove> moves = new ArrayList<>();
@@ -47,9 +46,11 @@ public class MoveCalculator {
         if (piece.getPieceType() == ChessPiece.PieceType.KING) {
             kingMoves(moves);
         }
+        if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
+            knightMoves(moves);
+        }
         return moves;
     }
-
     // create pawn promotion moves
     private void PromotionMoves(Collection<ChessMove> moves, ChessPosition destination) {
         moves.add(new ChessMove(position, destination, ChessPiece.PieceType.QUEEN));
@@ -91,6 +92,12 @@ public class MoveCalculator {
             r += specific_row;
             c += specific_col;
 
+        }
+    }
+
+    private void knight_helper(Collection<ChessMove> moves, int specific_row, int specific_col) {
+        var knightmove = new ChessPosition(specific_row, specific_col);
+        if (board.getPiece(knightmove) != null && board.getPiece(knightmove).getTeamColor() != piece.getTeamColor()) {
         }
     }
 
@@ -196,5 +203,12 @@ public class MoveCalculator {
         move_until_stop(moves, -1, 1);
         // down left
         move_until_stop(moves, -1, -1);
+    }
+    private void knightMoves(Collection<ChessMove> moves) {
+        // knight move forward 2 and then left or right
+        var upright = new ChessPosition(row + 2, col + 1);
+        var upleft = new ChessPosition(row + 2, col - 1);
+        var downright = new ChessPosition( row - 2, col +1);
+        var downleft = new ChessPosition(row+2, col - 1);
     }
     }
