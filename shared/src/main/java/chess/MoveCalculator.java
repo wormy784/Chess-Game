@@ -44,6 +44,9 @@ public class MoveCalculator {
         if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
             queenMoves(moves);
         }
+        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            kingMoves(moves);
+        }
         return moves;
     }
 
@@ -80,9 +83,14 @@ public class MoveCalculator {
                 }
                 return;
             }
+            // if it is a king don't do the while loop
+            if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+                return;
+            }
             //update so we don't just check the same square over and over
             r += specific_row;
             c += specific_col;
+
         }
     }
 
@@ -171,4 +179,22 @@ public class MoveCalculator {
         // down left
         move_until_stop(moves, -1, -1);
     }
-}
+    private void kingMoves(Collection<ChessMove> moves) {
+        //up
+        move_until_stop(moves, 1,0);
+        // down
+        move_until_stop(moves, -1, 0);
+        // right
+        move_until_stop(moves, 0, 1);
+        //lef
+        move_until_stop(moves, 0, -1);
+        // up right
+        move_until_stop(moves, 1,1);
+        // up left
+        move_until_stop(moves, 1, -1);
+        // down right
+        move_until_stop(moves, -1, 1);
+        // down left
+        move_until_stop(moves, -1, -1);
+    }
+    }
