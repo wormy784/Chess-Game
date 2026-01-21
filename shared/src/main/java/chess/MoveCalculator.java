@@ -31,23 +31,13 @@ public class MoveCalculator {
     //create moves arraylist
     public Collection<ChessMove> calculateMoves() {
         Collection<ChessMove> moves = new ArrayList<>();
-        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
-            pawnMoves(moves);
-        }
-        if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
-            rookMoves(moves);
-        }
-        if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
-            bishopMoves(moves);
-        }
-        if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
-            queenMoves(moves);
-        }
-        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-            kingMoves(moves);
-        }
-        if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
-            knightMoves(moves);
+        switch (piece.getPieceType()) {
+            case PAWN -> pawnMoves(moves);
+            case ROOK -> rookMoves(moves);
+            case BISHOP -> bishopMoves(moves);
+            case QUEEN -> queenMoves(moves);
+            case KING -> kingMoves(moves);
+            case KNIGHT -> knightMoves(moves);
         }
         return moves;
     }
