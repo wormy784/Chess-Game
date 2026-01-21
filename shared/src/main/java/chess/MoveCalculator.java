@@ -41,6 +41,9 @@ public class MoveCalculator {
         if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
             bishopMoves(moves);
         }
+        if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
+            queenMoves(moves);
+        }
         return moves;
     }
 
@@ -141,6 +144,24 @@ public class MoveCalculator {
         move_until_stop(moves, 0, -1);
     }
     private void bishopMoves(Collection<ChessMove> moves) {
+        // up right
+        move_until_stop(moves, 1,1);
+        // up left
+        move_until_stop(moves, 1, -1);
+        // down right
+        move_until_stop(moves, -1, 1);
+        // down left
+        move_until_stop(moves, -1, -1);
+    }
+    private void queenMoves(Collection<ChessMove> moves) {
+        //up
+        move_until_stop(moves, 1,0);
+        // down
+        move_until_stop(moves, -1, 0);
+        // right
+        move_until_stop(moves, 0, 1);
+        //lef
+        move_until_stop(moves, 0, -1);
         // up right
         move_until_stop(moves, 1,1);
         // up left
