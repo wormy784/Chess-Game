@@ -58,7 +58,6 @@ public class ChessBoardTests extends EqualsTestingUtility<ChessBoard> {
 
         var actualBoard = new ChessBoard();
         actualBoard.resetBoard();
-
         Assertions.assertEquals(expectedBoard, actualBoard, "Reset board did not create the correct board");
     }
 
