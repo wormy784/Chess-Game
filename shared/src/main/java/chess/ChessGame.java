@@ -8,12 +8,16 @@ import java.util.Collection;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
+
 public class ChessGame {
+    private ChessBoard board;
+    private TeamColor turn;
 
     public ChessGame() {
-
+        board = new ChessBoard();
+        board.resetBoard();
+        turn = TeamColor.WHITE;
     }
-
     @Override
     public int hashCode() {
         return super.hashCode();
@@ -28,7 +32,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return turn;
     }
 
     /**
@@ -37,7 +41,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        turn = team;
     }
 
     /**
@@ -56,7 +60,13 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        var piece = board.getPiece(startPosition);
+        if (piece == null) {
+            return null;
+        }
+        else {
+            return piece.pieceMoves(board, startPosition);
+        }
     }
 
     /**
@@ -66,7 +76,27 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        var piece = board.getPiece(move.getStartPosition());
+        if (piece == null) {
+            throw new InvalidMoveException("That's not a real move!");
+        }
+        if (piece.getTeamColor() != turn) {
+            throw new InvalidMoveException("That's not a real move!");
+
+        }
+        ChessPosition start = move.getStartPosition();
+        ChessPosition end = move.getEndPosition();
+        //remove piece form start
+        board.addPiece(start, null);
+        //place piece at end pos
+        board.addPiece(end, piece);
+        //switch turns
+        if (turn == TeamColor.WHITE) {
+            turn = TeamColor.BLACK;
+        }
+        else {
+            turn = TeamColor.WHITE;
+        }
     }
 
     /**
@@ -106,6 +136,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
+        //call resetboard from ChessBoard to reset all positions to start
         throw new RuntimeException("Not implemented");
     }
 
@@ -115,6 +146,7 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return board;
     }
+
 }
