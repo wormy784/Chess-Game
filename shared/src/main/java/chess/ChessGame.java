@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -106,7 +107,37 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+
+        Collection<ChessMove> other_team_moves = new ArrayList<>();
+        ChessPosition king_position = null;
+
+        for (int current_row = 1; current_row <= 8; current_row++) {
+            for (int current_col = 1; current_col <= 8; current_col++) {
+                var current_position = new ChessPosition(current_row, current_col);
+                var current_piece = board.getPiece(current_position);
+                if (current_piece == null) {
+                    continue;
+                }
+                // find the right king
+                if (current_piece.getPieceType() == ChessPiece.PieceType.KING) {
+                    if (current_piece.getTeamColor() == teamColor) {
+                        king_position = (new ChessPosition(current_row,current_col));
+                    }
+                }
+                // get the other team moves
+                if (current_piece.getTeamColor() != teamColor) {
+                    other_team_moves.addAll(current_piece.pieceMoves(board, current_position));
+
+                }
+            }
+        }
+        for (ChessMove move : other_team_moves) {
+            // see if == works or .equals()
+            if (move.getEndPosition().equals(king_position)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -136,7 +167,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        //call resetboard from ChessBoard to reset all positions to start
+        //call reset board from ChessBoard to reset all positions to start
         throw new RuntimeException("Not implemented");
     }
 
