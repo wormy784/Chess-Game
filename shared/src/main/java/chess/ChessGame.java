@@ -71,9 +71,29 @@ public class ChessGame {
         if (piece == null) {
             return null;
         }
-        else {
-            return piece.pieceMoves(board, startPosition);
+        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        for (ChessMove move : moves) {
+            ChessPosition start = move.getStartPosition();
+            ChessPosition end = move.getEndPosition();
+
+            var target = board.getPiece(end);
+
+            //remove piece form start
+            board.addPiece(start, null);
+            //place piece at end pos
+            board.addPiece(end, piece);
+
+            // add move only if not put king in check
+            if (!isInCheck(piece.getTeamColor())) {
+                validMoves.add(move);
+            }
+            // alays undo the move
+            board.addPiece(start, piece);
+            board.addPiece(end, target);
+
         }
+        return validMoves;
     }
 
     /**
