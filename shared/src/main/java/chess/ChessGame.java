@@ -76,7 +76,7 @@ public class ChessGame {
         for (ChessMove move : moves) {
             ChessPosition start = move.getStartPosition();
             ChessPosition end = move.getEndPosition();
-
+            // piece we want to move to
             var target = board.getPiece(end);
 
             //remove piece form start
@@ -124,7 +124,7 @@ public class ChessGame {
             throw new InvalidMoveException("That's not a real move!");
         }
 
-        // cant take own piece
+        // 4) cant take own piece
         if (target != null) {
             if (piece.getTeamColor() == target.getTeamColor()) {
                 throw new InvalidMoveException("You can't take your own piece.");
@@ -134,7 +134,7 @@ public class ChessGame {
         board.addPiece(start, null);
         //place piece at end pos
         board.addPiece(end, piece);
-        // if piece is a pawn and on right squares, it can promote
+        // 5) if piece is a pawn and on right squares, it can promote
         if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
             if ((end.getRow() == 1 || end.getRow() == 8)) {
                 ChessPiece.PieceType promotion = move.getPromotionPiece();
@@ -142,15 +142,14 @@ public class ChessGame {
                 board.addPiece(end, promoted_piece);
             }
         }
-        // cant move if puts king in check
+        // 6) cant move if puts king in check
         if (isInCheck(turn)) {
             board.addPiece(start, piece);
             board.addPiece(end, target);
             throw new InvalidMoveException("That puts the king in check!");
         }
 
-
-        //switch turns
+        // 7) switch turns
         if (turn == TeamColor.WHITE) {
             turn = TeamColor.BLACK;
         }
@@ -169,7 +168,7 @@ public class ChessGame {
 
         Collection<ChessMove> other_team_moves = new ArrayList<>();
         ChessPosition king_position = null;
-
+        // loop through all positions and get the moves of other pieces and see if it puts your king in check
         for (int current_row = 1; current_row <= 8; current_row++) {
             for (int current_col = 1; current_col <= 8; current_col++) {
                 var current_position = new ChessPosition(current_row, current_col);
@@ -191,7 +190,7 @@ public class ChessGame {
             }
         }
         for (ChessMove move : other_team_moves) {
-            // see if == works or .equals()
+            // .equals works and == doesn't here so take note, something to do with memory addresses maybe?
             if (move.getEndPosition().equals(king_position)) {
                 return true;
             }
@@ -206,6 +205,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+            // loop throuh all pieces, check moves of your team's pieces to get out of the check
             for (int current_row = 1; current_row <= 8; current_row++) {
                 for (int current_col = 1; current_col <= 8; current_col++) {
                     var current_position = new ChessPosition(current_row, current_col);
@@ -244,9 +244,11 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+
         if (isInCheck(teamColor)) {
             return false;
         }
+        // loop through all pieces on your team
         for (int current_row = 1; current_row <= 8; current_row++) {
             for (int current_col = 1; current_col <= 8; current_col++) {
                 var current_position = new ChessPosition(current_row, current_col);
@@ -255,6 +257,7 @@ public class ChessGame {
                 if (current_piece == null) {
                     continue;
                 }
+                // get moves of your team
                 if (current_piece.getTeamColor() == teamColor) {
                     Collection<ChessMove> moves = current_piece.pieceMoves(board, current_position);
                     for (ChessMove move : moves) {
