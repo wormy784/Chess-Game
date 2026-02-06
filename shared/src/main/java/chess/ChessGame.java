@@ -71,7 +71,9 @@ public class ChessGame {
         if (piece == null) {
             return null;
         }
+        // grabs moves collection from pieceMoves that we already made that has all the correct moves
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+        // new array of valid moves for the piece we are looking at, at the start position
         Collection<ChessMove> validMoves = new ArrayList<>();
         for (ChessMove move : moves) {
             ChessPosition start = move.getStartPosition();
@@ -79,6 +81,7 @@ public class ChessGame {
             // piece we want to move to
             var target = board.getPiece(end);
 
+            // we add the move as a test and see if it works out
             //remove piece form start
             board.addPiece(start, null);
             //place piece at end pos
@@ -88,7 +91,7 @@ public class ChessGame {
             if (!isInCheck(piece.getTeamColor())) {
                 validMoves.add(move);
             }
-            // alays undo the move
+            // always undo the move
             board.addPiece(start, piece);
             board.addPiece(end, target);
 
@@ -118,7 +121,7 @@ public class ChessGame {
 
         }
         // 3) check if move is legal move for that piece
-
+        // we get moves from the valid moves collection
         Collection<ChessMove> moves = validMoves(move.getStartPosition());
         if (moves == null || !moves.contains(move)) {
             throw new InvalidMoveException("That's not a real move!");
@@ -205,7 +208,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-            // loop throuh all pieces, check moves of your team's pieces to get out of the check
+            // loop through all pieces, check moves of your team's pieces to get out of the check
             for (int current_row = 1; current_row <= 8; current_row++) {
                 for (int current_col = 1; current_col <= 8; current_col++) {
                     var current_position = new ChessPosition(current_row, current_col);
