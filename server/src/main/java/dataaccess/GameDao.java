@@ -1,6 +1,6 @@
 package dataaccess;
 
-import chess.model.GameData;
+import model.GameData;
 
 class GameDao {
     void createGame(GameData g);
