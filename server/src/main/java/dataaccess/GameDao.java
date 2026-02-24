@@ -3,8 +3,16 @@ package dataaccess;
 import model.GameData;
 
 class GameDao {
-    void createGame(GameData g);
-    GameData getGame(int gameId);
-    void updateGame(GameData g);
+    void createGame(GameData g) {
+
+    }
+
+    GameData getGame(int gameId) {
+        return null;
+    }
+
+    void updateGame(GameData g) {
+
+    }
 
 }
