@@ -26,4 +26,9 @@ public class UserDao {
         // find userdata by username
         return users.get(username);
     }
+
+    public void clear() throws DataAccessException {
+        // clear the hashmap
+        users.clear();
+    }
 }

@@ -20,5 +20,8 @@ public class AuthDao {
     void deleteAuth(String authToken) throws DataAccessException {
         authTokens.remove(authToken);
     }
-
+    public void clear() throws DataAccessException {
+        // clear the hashmap
+        authTokens.clear();
+    }
 }

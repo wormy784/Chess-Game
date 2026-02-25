@@ -33,4 +33,8 @@ public class GameDao {
         games.put(g.gameID(), g);
     }
 
+    public void clear() throws DataAccessException {
+        // clear the hashmap
+        games.clear();
+    }
 }
