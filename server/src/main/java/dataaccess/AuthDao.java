@@ -7,17 +7,17 @@ public class AuthDao {
     private final HashMap<String, AuthData> authTokens = new HashMap<>();
 
     // create authentication token when user registers or logs in
-    void createAuth(AuthData auth) throws DataAccessException {
+    public void createAuth(AuthData auth) throws DataAccessException {
         authTokens.put(auth.authToken(), auth);
     }
 
     // retrieve auth data by token
-    AuthData getAuth(String authToken) throws DataAccessException {
+    public AuthData getAuth(String authToken) throws DataAccessException {
         return authTokens.get(authToken);
     }
 
     // remove auth token specifically for logout
-    void deleteAuth(String authToken) throws DataAccessException {
+    public void deleteAuth(String authToken) throws DataAccessException {
         authTokens.remove(authToken);
     }
     public void clear() throws DataAccessException {
