@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.*;
 import model.*;
+import java.util.UUID;
 public class UserService {
     // add fields for user and authdao
     private UserDao userDao;
@@ -15,7 +16,20 @@ public class UserService {
 
     // register
     public AuthData register(String username, String password, String email) throws DataAccessException {
-
+        UserData existingUser = userDao.getUser(username);
+        // check if username exists, throw exception if they do
+        if (existingUser != null) {
+            throw new DataAccessException("Error: already Taken");
+        }
+        // create new user
+        UserData newUser = new UserData(username, password, email);
+        userDao.createUser(newUser);
+        //generate auth token
+        String authToken = UUID.randomUUID().toString();
+        //create authtoken
+        AuthData newAuthData = new AuthData(authToken, username);
+        authDao.createAuth(newAuthData);
+        return newAuthData;
     }
     //login
     public AuthData login(String username, String password) throws DataAccessException {
