@@ -6,7 +6,9 @@ import dataaccess.UserDao;
 import io.javalin.*;
 import server.handler.*;
 import service.ClearService;
+import service.GameService;
 import service.UserService;
+
 
 public class Server {
     UserDao userDao = new UserDao();
@@ -16,7 +18,8 @@ public class Server {
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
-
+        GameService gameService = new GameService(gameDao, authDao);
+        UserService userService = new UserService(userDao, authDao);
         // Register your endpoints and exception handlers here.
 
         //clear
@@ -32,14 +35,14 @@ public class Server {
         LogoutHandler logoutHandler = new LogoutHandler(new UserService(userDao, authDao));
         javalin.delete("/session", logoutHandler::logout);
         // create game
-        CreateGameHandler createGameHandler = new CreateGameHandler();
+        CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
         javalin.post("/game", createGameHandler::createGame);
         // join game
-        JoinHandler joinHandler = new JoinHandler(new UserService(userDao, authDao));
-        javalin.post("/game", joinHandler::join);
-        // list games
-        ListHandler listHandler = new ListHandler(new UserService(userDao, authDao));
-        javalin.post("/game", listHandler::list);
+//        JoinHandler joinHandler = new JoinHandler(gameService);
+//        javalin.put("/game", joinHandler::join);
+//        // list games
+//        ListHandler listHandler = new ListHandler(gameService);
+//        javalin.get("/game", listHandler::list);
 
 
 
