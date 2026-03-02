@@ -51,4 +51,20 @@ public class UserServiceTest {
             userService.login("testuser", "wrongpassword");
         });
     }
+    @Test
+    public void logoutSuccess() throws DataAccessException {
+        // register user
+        AuthData result = userService.register("testuser", "password123", "test@gmail.com");
+        // logout user
+        userService.logout(result.authToken());
+        //assert null
+        Assertions.assertNull(authDao.getAuth(result.authToken()));
+    }
+    @Test
+    public void logoutInvalidAuthToken() throws DataAccessException {
+        // assert throws with token that doesnt exist
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            userService.logout("notrealtoken");
+        });
+    }
 }
