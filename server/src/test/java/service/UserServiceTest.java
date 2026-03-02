@@ -7,22 +7,25 @@ import org.junit.jupiter.api.*;
 public class UserServiceTest {
     private UserDao userDao;
     private AuthDao authDao;
-    private GameDao gameDao;
     private UserService userService;
 
     @BeforeEach
     public void setup() {
         userDao = new UserDao();
         authDao = new AuthDao();
-        gameDao = new GameDao();
+        GameDao gameDao = new GameDao();
         userService = new UserService(userDao, authDao);
     }
+    //register pos test
     @Test
     public void registerSuccess() throws DataAccessException {
         // test register
         AuthData result = userService.register("testuser", "password123", "test@gmail.com");
         Assertions.assertNotNull(userDao.getUser("testuser"));
+        Assertions.assertNotNull(result.authToken());
+        Assertions.assertEquals("testuser", result.username());
     }
+    //register neg test
     @Test
     public void registerUsernameTaken() throws DataAccessException {
         // regester user
@@ -32,6 +35,7 @@ public class UserServiceTest {
             userService.register("testuser", "password123", "test@gmail.com");
         });
     }
+    //login pos test
     @Test
     public void loginSuccess() throws DataAccessException {
         // register user
@@ -42,6 +46,7 @@ public class UserServiceTest {
         Assertions.assertEquals("testuser", loginResult.username());
         Assertions.assertNotNull(loginResult.authToken());
     }
+    //log neg test
     @Test
     public void loginWrongPassword() throws DataAccessException {
         // register user
@@ -51,6 +56,7 @@ public class UserServiceTest {
             userService.login("testuser", "wrongpassword");
         });
     }
+    //logout pos test
     @Test
     public void logoutSuccess() throws DataAccessException {
         // register user
@@ -60,9 +66,10 @@ public class UserServiceTest {
         //assert null
         Assertions.assertNull(authDao.getAuth(result.authToken()));
     }
+    // logout neg test
     @Test
     public void logoutInvalidAuthToken() throws DataAccessException {
-        // assert throws with token that doesnt exist
+        // assert throws with token that doesn't exist
         Assertions.assertThrows(DataAccessException.class, () -> {
             userService.logout("notrealtoken");
         });

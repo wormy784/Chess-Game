@@ -38,11 +38,11 @@ public class Server {
         CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
         javalin.post("/game", createGameHandler::createGame);
         // join game
-//        JoinHandler joinHandler = new JoinHandler(gameService);
-//        javalin.put("/game", joinHandler::join);
-//        // list games
-//        ListHandler listHandler = new ListHandler(gameService);
-//        javalin.get("/game", listHandler::list);
+        JoinHandler joinHandler = new JoinHandler(gameService);
+        javalin.put("/game", joinHandler::join);
+        // list games
+        ListHandler listHandler = new ListHandler(gameService);
+        javalin.get("/game", listHandler::list);
 
 
 

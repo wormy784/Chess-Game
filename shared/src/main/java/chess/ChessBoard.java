@@ -11,6 +11,10 @@ import java.util.Objects;
  */
 public class ChessBoard {
 
+    public ChessPiece[][] getSquares() {
+        return squares;
+    }
+
     ChessPiece[][] squares = new ChessPiece[8][8];
     public ChessBoard() {}
 

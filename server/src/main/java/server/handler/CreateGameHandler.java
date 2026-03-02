@@ -16,13 +16,13 @@ public class CreateGameHandler {
         var body = ctx.bodyAsClass(CreateGameRequest.class);
         // get authorization string from headers
         String authToken = ctx.header("authorization");
-        // is token missing
+        // is token missing 401
         if (authToken == null) {
             ctx.status(401);
             ctx.json(java.util.Map.of("message", "Error: unauthorized"));
             return;
         }
-        // is game name missing
+        // is game name missing 400
         if (body.gameName() == null) {
             ctx.status(400);
             ctx.json(java.util.Map.of("message", "Error: bad request"));

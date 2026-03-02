@@ -40,7 +40,7 @@ public class UserService {
     public AuthData login(String username, String password) throws DataAccessException {
         // check if user exists
         UserData existingUser = userDao.getUser(username);
-        // check if username is null or password doesnt match
+        // check if username is null or password doesn't match
         // 401
         if (existingUser == null || !Objects.equals(existingUser.password(), password)) {
             throw new DataAccessException("Error: unauthorized");
