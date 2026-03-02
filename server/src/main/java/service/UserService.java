@@ -18,10 +18,13 @@ public class UserService {
 
     // register
     public AuthData register(String username, String password, String email) throws DataAccessException {
+        if (username == null || password == null || email == null) {
+            throw new DataAccessException("Error: bad request");
+        }
         UserData existingUser = userDao.getUser(username);
         // check if username exists, throw exception if they do
         if (existingUser != null) {
-            throw new DataAccessException("Error: already Taken");
+            throw new DataAccessException("Error: already taken");
         }
         // create new user
         UserData newUser = new UserData(username, password, email);
@@ -35,13 +38,11 @@ public class UserService {
     }
     //login
     public AuthData login(String username, String password) throws DataAccessException {
+        // check if user exists
         UserData existingUser = userDao.getUser(username);
-        // check if username exists, throw exception if they dont
-        if (existingUser == null) {
-            throw new DataAccessException("Error: unauthorized");
-        }
-        // check if passwd matches
-        if (!Objects.equals(existingUser.password(), password)) {
+        // check if username is null or password doesnt match
+        // 401
+        if (existingUser == null || !Objects.equals(existingUser.password(), password)) {
             throw new DataAccessException("Error: unauthorized");
         }
         // generate new authtoken
