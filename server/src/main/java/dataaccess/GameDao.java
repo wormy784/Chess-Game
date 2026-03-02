@@ -11,7 +11,7 @@ public class GameDao {
     // hashmap to store games
     private final HashMap<Integer, GameData> games = new HashMap<>();
 
-    public void createGame(GameData g) throws DataAccessException {
+    public int createGame(GameData g) throws DataAccessException {
         GameData newGame = new GameData(nextGameID, g.whiteUsername(), g.blackUsername(),
                 g.gameName(), g.game());
 
@@ -19,6 +19,7 @@ public class GameDao {
         games.put(newGame.gameID(), newGame);
         //increment gameid
         nextGameID++;
+        return newGame.gameID();
     }
 
     public GameData getGame(int gameId) throws DataAccessException {

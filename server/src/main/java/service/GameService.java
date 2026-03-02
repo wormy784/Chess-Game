@@ -14,7 +14,15 @@ public class GameService {
         this.authDao = authDao;
     }
     public int createGame(String authToken, String gameName) throws DataAccessException {
-
+        // verify authtoken
+        var auth = authDao.getAuth(authToken);
+        // throw exception if null
+        if (auth == null) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+        // create gameData
+        GameData newGame = new GameData(0, null, null, gameName, new chess.ChessGame());
+        return gameDao.createGame(newGame);
     }
     public Collection<GameData> listGames(String authToken) throws DataAccessException {
         // verify authtoken
