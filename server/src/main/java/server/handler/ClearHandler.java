@@ -16,7 +16,6 @@ public class ClearHandler {
             ctx.result("{}");
         } catch (DataAccessException e) {
             ctx.status(500);
-            ctx.json(java.util.Map.of("message", e.getMessage()));
-        }
+            ctx.result("{ \"message\": \"Error: " + e.getMessage() + "\" }");        }
     }
 }

@@ -3,6 +3,7 @@ package server.handler;
 import service.UserService;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
+
 public class LogoutHandler {
     private final UserService logout;
 
@@ -23,10 +24,9 @@ public class LogoutHandler {
             logout.logout(token);
             //success
             ctx.status(200);
-            ctx.json(java.util.Map.of());
+            ctx.result("{}");
         } catch (DataAccessException e) {
             ctx.status(401);
-            ctx.json(java.util.Map.of("message", e.getMessage()));
-        }
+            ctx.result("{ \"message\": \"Error: unauthorized\" }");        }
     }
 }
