@@ -2,8 +2,6 @@ package service;
 
 import dataaccess.*;
 import model.*;
-
-import java.util.Objects;
 import java.util.UUID;
 public class UserService {
     // add fields for user and authdao
@@ -38,11 +36,9 @@ public class UserService {
     }
     //login
     public AuthData login(String username, String password) throws DataAccessException {
-        // check if user exists
-        UserData existingUser = userDao.getUser(username);
         // check if username is null or password doesn't match
         // 401
-        if (existingUser == null || !Objects.equals(existingUser.password(), password)) {
+        if (!userDao.verify(username, password)) {
             throw new DataAccessException("Error: unauthorized");
         }
         // generate new authtoken

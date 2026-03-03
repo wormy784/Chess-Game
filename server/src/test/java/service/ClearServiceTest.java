@@ -6,13 +6,15 @@ import org.junit.jupiter.api.*;
 
 public class ClearServiceTest {
     private UserDao userDao;
+    private AuthDao authDao;
+    private GameDao gameDao;
     private ClearService clearService;
 
     @BeforeEach
     public void setup() {
         userDao = new UserDao();
-        AuthDao authDao = new AuthDao();
-        GameDao gameDao = new GameDao();
+        authDao = new AuthDao();
+        gameDao = new GameDao();
         clearService = new ClearService(userDao, authDao, gameDao);
     }
 

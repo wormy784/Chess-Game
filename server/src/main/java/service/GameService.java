@@ -4,7 +4,7 @@ import dataaccess.*;
 import model.*;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.UUID;
+
 public class GameService {
     // add fields for game and authdao
     private GameDao gameDao;

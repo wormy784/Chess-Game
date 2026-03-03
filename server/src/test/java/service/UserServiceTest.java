@@ -7,13 +7,14 @@ import org.junit.jupiter.api.*;
 public class UserServiceTest {
     private UserDao userDao;
     private AuthDao authDao;
+    private GameDao gameDao;
     private UserService userService;
 
     @BeforeEach
     public void setup() {
         userDao = new UserDao();
         authDao = new AuthDao();
-        GameDao gameDao = new GameDao();
+        gameDao = new GameDao();
         userService = new UserService(userDao, authDao);
     }
     //register pos test

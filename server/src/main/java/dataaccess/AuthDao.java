@@ -1,5 +1,4 @@
 package dataaccess;
-import java.util.UUID;
 import java.util.HashMap;
 import model.AuthData;
 public class AuthDao {

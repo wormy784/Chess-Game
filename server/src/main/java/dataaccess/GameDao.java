@@ -1,8 +1,6 @@
 package dataaccess;
 
 import model.GameData;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -17,7 +15,7 @@ public class GameDao {
 
         // Add to hashmap
         games.put(newGame.gameID(), newGame);
-        //increment gameid
+        // increment gameID
         nextGameID++;
         return newGame.gameID();
     }
