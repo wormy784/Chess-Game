@@ -4,9 +4,11 @@ import service.GameService;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import java.util.Map;
+import com.google.gson.Gson;
 
 public class JoinHandler {
     private final GameService gameService;
+    private final Gson gson = new Gson();
 
     public JoinHandler(GameService gameService) {
         this.gameService = gameService;
@@ -14,25 +16,30 @@ public class JoinHandler {
 
     public void join(Context ctx) {
         // record gets color and id
-        record JoinRequest(String playerColor, int gameID) {}
+        record JoinRequest(String playerColor, Integer gameID) {}
         // get the auth token from the header
         String authToken = ctx.header("authorization");
 
         // Parse the body into record bro
-        var body = ctx.bodyAsClass(JoinRequest.class);
+        var body = gson.fromJson(ctx.body(), JoinRequest.class);
 
-        // check auth token
-        //401
-        if (authToken == null) {
-            ctx.status(401);
-            ctx.json(Map.of("message", "Error: unauthorized"));
-            return;
-        }
         //if color null or not one of the options then error
         //401
-        if (body.playerColor() == null || (!body.playerColor().equals("WHITE") && !body.playerColor().equals("BLACK"))) {
+        if (body == null || body.gameID() == null || body.playerColor() == null) {
             ctx.status(400);
-            ctx.json(Map.of("message", "Error: bad request"));
+            ctx.result("{ \"message\": \"Error: bad request\" }");
+            return;
+        }
+        // check auth token
+        //401
+        if (authToken == null || authToken.isBlank()) {
+            ctx.status(401);
+            ctx.result("{ \"message\": \"Error: unauthorized\" }");
+            return;
+        }
+        if (!body.playerColor().equals("WHITE") && !body.playerColor().equals("BLACK")) {
+            ctx.status(400);
+            ctx.result("{ \"message\": \"Error: bad request\" }");
             return;
         }
         try {
@@ -40,22 +47,19 @@ public class JoinHandler {
             gameService.joinGame(authToken, body.gameID(), body.playerColor());
             // success case
             ctx.status(200);
-            ctx.json(Map.of());
+            ctx.result("{}");
 
         } catch (DataAccessException e) {
             // if already taken, then already taken error
             if (e.getMessage().contains("already taken")) {
                 ctx.status(403);
-                ctx.json(Map.of("message", "Error: already taken"));
-                //game id doesnt exist 400
+                ctx.result("{ \"message\": \"Error: already taken\" }");                //game id doesnt exist 400
             } else if (e.getMessage().contains("bad request")) {
                 ctx.status(400);
-                ctx.json(Map.of("message", "Error: bad request"));
-            } else {
+                ctx.result("{ \"message\": \"Error: bad request\" }");            } else {
                 // token is invalid 401
                 ctx.status(401);
-                ctx.json(Map.of("message", "Error: unauthorized"));
-            }
+                ctx.result("{ \"message\": \"Error: unauthorized\" }");            }
         }
     }
 }

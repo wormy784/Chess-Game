@@ -17,57 +17,35 @@ public class Server {
     private final Javalin javalin;
 
     public Server() {
-        javalin = Javalin.create(config -> {
-            config.staticFiles.add("web");
-
-            // --- ADD THIS MAPPER CONFIGURATION ---
-            config.jsonMapper(new io.javalin.json.JsonMapper() {
-                private final com.google.gson.Gson gson = new com.google.gson.Gson();
-
-                @Override
-                public String toJsonString(@org.jetbrains.annotations.NotNull Object obj, @org.jetbrains.annotations.NotNull java.lang.reflect.Type type) {
-                    return gson.toJson(obj);
-                }
-
-                @Override
-                public <T> T fromJsonString(@org.jetbrains.annotations.NotNull String json, @org.jetbrains.annotations.NotNull java.lang.reflect.Type targetType) {
-                    return gson.fromJson(json, targetType);
-                }
-            });
-            // --------------------------------------
-        });
-
-        // Your existing Services and Handlers stay exactly the same:
+        javalin = Javalin.create(config -> config.staticFiles.add("web"));
         GameService gameService = new GameService(gameDao, authDao);
         UserService userService = new UserService(userDao, authDao);
+        // Register your endpoints and exception handlers here.
 
-        // clear
+        //clear
         ClearHandler clearHandler = new ClearHandler(new ClearService(userDao, authDao, gameDao));
         javalin.delete("/db", clearHandler::clear);
-
-        // register
+        //register
         RegisterHandler registerHandler = new RegisterHandler(new UserService(userDao, authDao));
         javalin.post("/user", registerHandler::register);
-
         // login
         LoginHandler loginHandler = new LoginHandler(new UserService(userDao, authDao));
         javalin.post("/session", loginHandler::login);
-
         // logout
         LogoutHandler logoutHandler = new LogoutHandler(new UserService(userDao, authDao));
         javalin.delete("/session", logoutHandler::logout);
-
         // create game
         CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
         javalin.post("/game", createGameHandler::createGame);
-
         // join game
         JoinHandler joinHandler = new JoinHandler(gameService);
         javalin.put("/game", joinHandler::join);
-
         // list games
         ListHandler listHandler = new ListHandler(gameService);
         javalin.get("/game", listHandler::list);
+
+
+
     }
 
     public int run(int desiredPort) {
