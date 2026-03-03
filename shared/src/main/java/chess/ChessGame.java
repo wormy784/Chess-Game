@@ -141,8 +141,8 @@ public class ChessGame {
         if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
             if ((end.getRow() == 1 || end.getRow() == 8)) {
                 ChessPiece.PieceType promotion = move.getPromotionPiece();
-                ChessPiece promoted_piece = new ChessPiece(piece.getTeamColor(), promotion);
-                board.addPiece(end, promoted_piece);
+                ChessPiece promotedPiece = new ChessPiece(piece.getTeamColor(), promotion);
+                board.addPiece(end, promotedPiece);
             }
         }
         // 6) cant move if puts king in check
@@ -169,32 +169,32 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
 
-        Collection<ChessMove> other_team_moves = new ArrayList<>();
-        ChessPosition king_position = null;
+        Collection<ChessMove> otherTeamMoves = new ArrayList<>();
+        ChessPosition kingPosition = null;
         // loop through all positions and get the moves of other pieces and see if it puts your king in check
-        for (int current_row = 1; current_row <= 8; current_row++) {
-            for (int current_col = 1; current_col <= 8; current_col++) {
-                var current_position = new ChessPosition(current_row, current_col);
-                var current_piece = board.getPiece(current_position);
-                if (current_piece == null) {
+        for (int currentRow = 1; currentRow <= 8; currentRow++) {
+            for (int currentCol = 1; currentCol <= 8; currentCol++) {
+                var currentPosition = new ChessPosition(currentRow, currentCol);
+                var currentPiece = board.getPiece(currentPosition);
+                if (currentPiece == null) {
                     continue;
                 }
                 // find the right king
-                if (current_piece.getPieceType() == ChessPiece.PieceType.KING) {
-                    if (current_piece.getTeamColor() == teamColor) {
-                        king_position = (new ChessPosition(current_row,current_col));
+                if (currentPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                    if (currentPiece.getTeamColor() == teamColor) {
+                        kingPosition = (new ChessPosition(currentRow,currentCol));
                     }
                 }
                 // get the other team moves
-                if (current_piece.getTeamColor() != teamColor) {
-                    other_team_moves.addAll(current_piece.pieceMoves(board, current_position));
+                if (currentPiece.getTeamColor() != teamColor) {
+                    otherTeamMoves.addAll(currentPiece.pieceMoves(board, currentPosition));
 
                 }
             }
         }
-        for (ChessMove move : other_team_moves) {
+        for (ChessMove move : otherTeamMoves) {
             // .equals works and == doesn't here so take note, something to do with memory addresses maybe?
-            if (move.getEndPosition().equals(king_position)) {
+            if (move.getEndPosition().equals(kingPosition)) {
                 return true;
             }
         }
@@ -208,34 +208,34 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-            // loop through all pieces, check moves of your team's pieces to get out of the check
-            for (int current_row = 1; current_row <= 8; current_row++) {
-                for (int current_col = 1; current_col <= 8; current_col++) {
-                    var current_position = new ChessPosition(current_row, current_col);
-                    var current_piece = board.getPiece(current_position);
+        // loop through all pieces, check moves of your team's pieces to get out of the check
+        for (int currentRow = 1; currentRow <= 8; currentRow++) {
+            for (int currentCol = 1; currentCol <= 8; currentCol++) {
+                var currentPosition = new ChessPosition(currentRow, currentCol);
+                var currentPiece = board.getPiece(currentPosition);
 
-                    if (current_piece == null) {
-                        continue;
-                    }
-                    if (current_piece.getTeamColor() == teamColor) {
-                        Collection<ChessMove> moves = current_piece.pieceMoves(board, current_position);
-                        for (ChessMove move : moves) {
-                            var start = move.getStartPosition();
-                            var end = move.getEndPosition();
-                            var captured = board.getPiece(end);
-                            board.addPiece(end, current_piece);
-                            board.addPiece(start, null);
+                if (currentPiece == null) {
+                    continue;
+                }
+                if (currentPiece.getTeamColor() == teamColor) {
+                    Collection<ChessMove> moves = currentPiece.pieceMoves(board, currentPosition);
+                    for (ChessMove move : moves) {
+                        var start = move.getStartPosition();
+                        var end = move.getEndPosition();
+                        var captured = board.getPiece(end);
+                        board.addPiece(end, currentPiece);
+                        board.addPiece(start, null);
 
-                            if (!isInCheck(teamColor)) {
-                                return false;
-                            }
-
-                            board.addPiece(start, current_piece);
-                            board.addPiece(end, captured);
+                        if (!isInCheck(teamColor)) {
+                            return false;
                         }
+
+                        board.addPiece(start, currentPiece);
+                        board.addPiece(end, captured);
                     }
                 }
             }
+        }
         return true;
     }
 
@@ -252,29 +252,29 @@ public class ChessGame {
             return false;
         }
         // loop through all pieces on your team
-        for (int current_row = 1; current_row <= 8; current_row++) {
-            for (int current_col = 1; current_col <= 8; current_col++) {
-                var current_position = new ChessPosition(current_row, current_col);
-                var current_piece = board.getPiece(current_position);
+        for (int currentRow = 1; currentRow <= 8; currentRow++) {
+            for (int currentCol = 1; currentCol <= 8; currentCol++) {
+                var currentPosition = new ChessPosition(currentRow, currentCol);
+                var currentPiece = board.getPiece(currentPosition);
 
-                if (current_piece == null) {
+                if (currentPiece == null) {
                     continue;
                 }
                 // get moves of your team
-                if (current_piece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> moves = current_piece.pieceMoves(board, current_position);
+                if (currentPiece.getTeamColor() == teamColor) {
+                    Collection<ChessMove> moves = currentPiece.pieceMoves(board, currentPosition);
                     for (ChessMove move : moves) {
                         var start = move.getStartPosition();
                         var end = move.getEndPosition();
                         var captured = board.getPiece(end);
-                        board.addPiece(end, current_piece);
+                        board.addPiece(end, currentPiece);
                         board.addPiece(start, null);
 
                         if (!isInCheck(teamColor)) {
                             return false;
                         }
 
-                        board.addPiece(start, current_piece);
+                        board.addPiece(start, currentPiece);
                         board.addPiece(end, captured);
                     }
                 }
