@@ -43,5 +43,32 @@ public class SqlAuthDao {
         }
         return null;
     }
+    public void deleteAuth(AuthData auth) throws DataAccessException {
+        // SQL string
+        String insert = "DELETE FROM auth WHERE authToken = ?";
+        // open connection
+        try (var connection = DatabaseManager.getConnection(); var preparedStatement = connection.prepareStatement(insert)) {
+            preparedStatement.setString(1, auth.authToken());
+            // prepare statement
+            preparedStatement.executeUpdate();
+            //execute
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to delete auth %s", e.getMessage()));
+        }
+    }
+
+    public void clearAuth() throws DataAccessException {
+        // SQL string
+        String insert = "TRUNCATE TABLE auth";
+        // open connection
+        try (var connection = DatabaseManager.getConnection(); var preparedStatement = connection.prepareStatement(insert)) {
+            // prepare statement
+            preparedStatement.executeUpdate();
+            //execute
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to clear auth %s", e.getMessage()));
+        }
+    }
+
 
 }
