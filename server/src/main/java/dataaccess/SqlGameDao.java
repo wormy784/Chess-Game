@@ -15,17 +15,19 @@ import java.util.Collection;
 public class SqlGameDao {
     // translate Game to sql version
 
-    public void createGame(GameData Game) throws DataAccessException {
+    public void createGame(GameData game) throws DataAccessException {
         // SQL string
-        String insert = "INSERT INTO Game (whiteUsername, blackUsername, gameName, jsonString) VALUES (?, ?, ?, ?)";
+        String insert = "INSERT INTO Game (whiteUsername, blackUsername, gameName, jsonString, gameID) VALUES (?, ?, ?, ?)";
         // open connection
         try (var connection = DatabaseManager.getConnection(); var preparedStatement = connection.prepareStatement(insert)) {
-            preparedStatement.setString(1, Game.whiteUsername());
-            preparedStatement.setString(2, Game.blackUsername());
-            preparedStatement.setString(3, Game.gameName());
+            preparedStatement.setString(1, game.whiteUsername());
+            preparedStatement.setString(2, game.blackUsername());
+            preparedStatement.setString(3, game.gameName());
             //convert game object to string
-            String json = new Gson().toJson(Game.game());
+            String json = new Gson().toJson(game.game());
             preparedStatement.setString(4, json);
+            preparedStatement.setInt(4, game.gameID());
+
             // prepare statement
             preparedStatement.executeUpdate();
             //execute
@@ -75,8 +77,19 @@ public class SqlGameDao {
         }
         return games;
     }
-    public void updateGame(GameData game) {
-
+    public void updateGame(GameData game) throws DataAccessException{
+        var statement = "UPDATE Game SET whiteUsername = ?, blackUsername = ?, jsonString = ? WHERE gameID = ?";
+        try (var connection = DatabaseManager.getConnection(); var preparedStatement = connection.prepareStatement(statement)) {
+            preparedStatement.setString(1, game.whiteUsername());
+            preparedStatement.setString(2, game.blackUsername());
+            String json = new Gson().toJson(game.game());
+            preparedStatement.setString(3, json);
+            preparedStatement.setInt(4, game.gameID());
+            // prepare statement
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to update game %s", e.getMessage()));
+        }
     }
 
     public void clearGame() throws DataAccessException {
