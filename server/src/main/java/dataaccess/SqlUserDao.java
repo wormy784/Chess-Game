@@ -57,20 +57,6 @@ public class SqlUserDao implements IUserDao {
         }
         return null;
     }
-    // we dont actually need this method
-//    public void deleteUser(UserData user) throws DataAccessException {
-//        // SQL string
-//        String insert = "DELETE FROM user WHERE username = ?";
-//        // open connection
-//        try (var connection = DatabaseManager.getConnection(); var preparedStatement = connection.prepareStatement(insert)) {
-//            preparedStatement.setString(1, user.username());
-//            // prepare statement
-//            preparedStatement.executeUpdate();
-//            //execute
-//        } catch (SQLException e) {
-//            throw new DataAccessException(String.format("unable to delete user %s", e.getMessage()));
-//        }
-//    }
 
     public void clear() throws DataAccessException {
         // SQL string
