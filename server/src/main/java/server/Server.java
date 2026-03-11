@@ -47,14 +47,13 @@ public class Server {
 
     }
 
-    public int run(int desiredPort) throws DataAccessException {
+    public int run(int desiredPort) {
         try {
             //create database
             new SqlSetup();
             javalin.start(desiredPort);
         } catch (DataAccessException e) {
             System.out.printf("Failed to initialize database: %s%n", e.getMessage());
-            throw e;
         }
         return javalin.port();
     }
