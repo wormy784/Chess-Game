@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class SqlGameDao {
     // translate Game to sql version
@@ -48,13 +50,30 @@ public class SqlGameDao {
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+            throw new DataAccessException(String.format("Unable to get game: %s", e.getMessage()));
         }
         return null;
     }
 
-    public void listGames() {
-
+    public Collection<GameData> listGames() throws DataAccessException {
+        ArrayList<GameData> games = new ArrayList<>();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM Game";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String json = rs.getString("jsonString");
+                        ChessGame game = new Gson().fromJson(json, ChessGame.class);
+                        games.add(new GameData(rs.getInt("gameID"), rs.getString( "whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), game));
+                    }
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return games;
     }
     public void updateGame(GameData game) {
 
