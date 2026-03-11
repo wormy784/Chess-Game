@@ -30,7 +30,7 @@ public class UserServiceTest {
     @Test
     public void registerUsernameTaken() throws DataAccessException {
         // regester user
-        AuthData result = userService.register("testuser", "password123", "test@gmail.com");
+        userService.register("testuser", "password123", "test@gmail.com");
         // register again with same name
         Assertions.assertThrows(DataAccessException.class, () -> {
             userService.register("testuser", "password123", "test@gmail.com");
