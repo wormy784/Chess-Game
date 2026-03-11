@@ -38,17 +38,17 @@ public class SqlAuthDao {
                 throw new DataAccessException(String.format("Error finding auth: %s", ex.getMessage()));
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
         }
         return null;
     }
-    public void deleteAuth(AuthData auth) throws DataAccessException {
+    public void deleteAuth(String authToken) throws DataAccessException {
         // SQL string
         String insert = "DELETE FROM auth WHERE authToken = ?";
         // open connection
         try (var connection = DatabaseManager.getConnection(); var preparedStatement = connection.prepareStatement(insert)) {
-            preparedStatement.setString(1, auth.authToken());
+            preparedStatement.setString(1, authToken);
             // prepare statement
             preparedStatement.executeUpdate();
             //execute

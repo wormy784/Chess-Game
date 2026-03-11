@@ -14,7 +14,7 @@ public class SqlUserDao {
 
     public boolean verifyUser(String username, String providedClearTextPassword) throws DataAccessException {
         // read the previously hashed password from the database
-        var hashedPassword = getUser(username);
+        UserData hashedPassword = getUser(username);
         if (hashedPassword == null) {
             return false;
         }
