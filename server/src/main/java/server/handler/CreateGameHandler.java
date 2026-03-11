@@ -37,7 +37,14 @@ public class CreateGameHandler {
             // send success response
             ctx.status(200);
             ctx.result(gson.toJson(java.util.Map.of("gameID", gameID)));        } catch (DataAccessException e) {
-            ctx.status(401);
-            ctx.result("{ \"message\": \"Error: unauthorized\" }");        }
+            if (e.getMessage().contains("Error: unauthorized")) {
+                ctx.status(401);
+                ctx.result("{ \"message\": \"Error: unauthorized\" }");
+                //otherwise 500
+            } else {
+                ctx.status(500);
+                ctx.result("{ \"message\": \"Error: " + e.getMessage() + "\" }");
+            }
+        }
     }
 }

@@ -33,8 +33,14 @@ public class ListHandler {
         } catch (DataAccessException e) {
             // if token invalid
             //401
-            ctx.status(401);
-            ctx.result("{ \"message\": \"Error: unauthorized\" }");
+            if (e.getMessage().contains("Error: unauthorized")) {
+                ctx.status(401);
+                ctx.result("{ \"message\": \"Error: unauthorized\" }");
+                //otherwise 500
+            } else {
+                ctx.status(500);
+                ctx.result("{ \"message\": \"Error: " + e.getMessage() + "\" }");
+            }
         }
     }
 }

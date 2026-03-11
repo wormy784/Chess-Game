@@ -29,8 +29,13 @@ public class LogoutHandler {
             ctx.status(200);
             ctx.result("{}");
         } catch (DataAccessException e) {
-            ctx.status(401);
-            ctx.result("{ \"message\": \"Error: unauthorized\" }");
+            if (e.getMessage().contains("Error: unauthorized")) {
+                ctx.status(401);
+                ctx.result("{ \"message\": \"Error: unauthorized\" }");
+        } else {
+            ctx.status(500);
+            ctx.result("{ \"message\": \"Error:" + e.getMessage() + "\" }");
+        }
         }
     }
 }

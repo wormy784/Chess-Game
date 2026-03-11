@@ -53,13 +53,22 @@ public class JoinHandler {
             // if already taken, then already taken error
             if (e.getMessage().contains("already taken")) {
                 ctx.status(403);
-                ctx.result("{ \"message\": \"Error: already taken\" }");                //game id doesnt exist 400
+                ctx.result("{ \"message\": \"Error: already taken\" }");
+                //game id doesnt exist 400
             } else if (e.getMessage().contains("bad request")) {
                 ctx.status(400);
-                ctx.result("{ \"message\": \"Error: bad request\" }");            } else {
+                ctx.result("{ \"message\": \"Error: bad request\" }");
+            } else {
                 // token is invalid 401
-                ctx.status(401);
-                ctx.result("{ \"message\": \"Error: unauthorized\" }");            }
+                if (e.getMessage().contains("Error: unauthorized")) {
+                    ctx.status(401);
+                    ctx.result("{ \"message\": \"Error: unauthorized\" }");
+                    //otherwise 500
+                } else {
+                    ctx.status(500);
+                    ctx.result("{ \"message\": \"Error: " + e.getMessage() + "\" }");
+                }
+            }
         }
     }
 }
