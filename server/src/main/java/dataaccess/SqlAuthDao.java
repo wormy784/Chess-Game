@@ -35,7 +35,7 @@ public class SqlAuthDao {
                         return new AuthData(rs.getString("authToken"), rs.getString("username"));
                     }
                 } catch (SQLException ex) {
-                throw new RuntimeException(ex);
+                throw new DataAccessException(String.format("Error finding auth: %s", ex.getMessage()));
                 }
             }
         } catch (Exception e) {

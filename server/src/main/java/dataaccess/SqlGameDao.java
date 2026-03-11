@@ -3,7 +3,6 @@ package dataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,7 +16,7 @@ public class SqlGameDao {
 
     public void createGame(GameData game) throws DataAccessException {
         // SQL string
-        String insert = "INSERT INTO Game (whiteUsername, blackUsername, gameName, jsonString) VALUES (?, ?, ?, ?)";
+        String insert = "INSERT INTO game (whiteUsername, blackUsername, gameName, jsonString) VALUES (?, ?, ?, ?)";
         // open connection
         try (var connection = DatabaseManager.getConnection(); var preparedStatement = connection.prepareStatement(insert)) {
             preparedStatement.setString(1, game.whiteUsername());
@@ -47,7 +46,7 @@ public class SqlGameDao {
                         return new GameData(rs.getInt("gameID"), rs.getString( "whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), game);
                     }
                 } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
+                    throw new DataAccessException(String.format("Error accessing game data: %s", ex.getMessage()));
                 }
             }
         } catch (Exception e) {
@@ -59,7 +58,7 @@ public class SqlGameDao {
     public Collection<GameData> listGames() throws DataAccessException {
         ArrayList<GameData> games = new ArrayList<>();
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT * FROM Game";
+            var statement = "SELECT * FROM game";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
@@ -68,7 +67,7 @@ public class SqlGameDao {
                         games.add(new GameData(rs.getInt("gameID"), rs.getString( "whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), game));
                     }
                 } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
+                    throw new DataAccessException(String.format("Error accessing game data: %s", ex.getMessage()));
                 }
             }
         } catch (Exception e) {
@@ -77,7 +76,7 @@ public class SqlGameDao {
         return games;
     }
     public void updateGame(GameData game) throws DataAccessException{
-        var statement = "UPDATE Game SET whiteUsername = ?, blackUsername = ?, jsonString = ? WHERE gameID = ?";
+        var statement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, jsonString = ? WHERE gameID = ?";
         try (var connection = DatabaseManager.getConnection(); var preparedStatement = connection.prepareStatement(statement)) {
             preparedStatement.setString(1, game.whiteUsername());
             preparedStatement.setString(2, game.blackUsername());
@@ -93,7 +92,7 @@ public class SqlGameDao {
 
     public void clearGame() throws DataAccessException {
         // SQL string
-        String insert = "TRUNCATE TABLE Game";
+        String insert = "TRUNCATE TABLE game";
         // open connection
         try (var connection = DatabaseManager.getConnection(); var preparedStatement = connection.prepareStatement(insert)) {
             // prepare statement

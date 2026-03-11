@@ -39,7 +39,7 @@ public class SqlUserDao {
                         return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
                     }
                 } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
+                    throw new DataAccessException(String.format("Error finding user %s: %s", username, ex.getMessage()));
                 }
             }
         } catch (Exception e) {
