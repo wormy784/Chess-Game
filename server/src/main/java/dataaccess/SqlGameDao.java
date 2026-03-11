@@ -17,7 +17,7 @@ public class SqlGameDao {
 
     public void createGame(GameData game) throws DataAccessException {
         // SQL string
-        String insert = "INSERT INTO Game (whiteUsername, blackUsername, gameName, jsonString, gameID) VALUES (?, ?, ?, ?)";
+        String insert = "INSERT INTO Game (whiteUsername, blackUsername, gameName, jsonString) VALUES (?, ?, ?, ?)";
         // open connection
         try (var connection = DatabaseManager.getConnection(); var preparedStatement = connection.prepareStatement(insert)) {
             preparedStatement.setString(1, game.whiteUsername());
@@ -26,7 +26,6 @@ public class SqlGameDao {
             //convert game object to string
             String json = new Gson().toJson(game.game());
             preparedStatement.setString(4, json);
-            preparedStatement.setInt(4, game.gameID());
 
             // prepare statement
             preparedStatement.executeUpdate();
