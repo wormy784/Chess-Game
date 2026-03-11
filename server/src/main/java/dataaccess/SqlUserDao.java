@@ -8,8 +8,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+
 public class SqlUserDao {
     // translate user to sql version
+
+    public boolean verifyUser(String username, String providedClearTextPassword) throws DataAccessException {
+        // read the previously hashed password from the database
+        var hashedPassword = getUser(username);
+        if (hashedPassword == null) {
+            return false;
+        }
+        return BCrypt.checkpw(providedClearTextPassword, hashedPassword.password());
+    }
 
     public void createUser(UserData user) throws DataAccessException {
         // SQL string
@@ -42,7 +52,7 @@ public class SqlUserDao {
                     throw new DataAccessException(String.format("Error finding user %s: %s", username, ex.getMessage()));
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
         }
         return null;
