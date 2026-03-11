@@ -18,9 +18,10 @@ public class SqlGameDao implements IGameDao{
     public int createGame(GameData game) throws DataAccessException {
         // SQL string
         String insert = "INSERT INTO game (whiteUsername, blackUsername, gameName, jsonString) VALUES (?, ?, ?, ?)";
-        int ID = 0;
+        int id = 0;
         // open connection
-        try (var connection = DatabaseManager.getConnection(); var preparedStatement = connection.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS)) {
+        try (var connection = DatabaseManager.getConnection(); var preparedStatement
+                = connection.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, game.whiteUsername());
             preparedStatement.setString(2, game.blackUsername());
             preparedStatement.setString(3, game.gameName());
@@ -33,25 +34,27 @@ public class SqlGameDao implements IGameDao{
             //ask for generated keys
             try (var rs = preparedStatement.getGeneratedKeys()) {
                 if (rs.next()) {
-                    ID = rs.getInt(1);
+                    id = rs.getInt(1);
                 }
             }
         } catch (SQLException e) {
             throw new DataAccessException(String.format("unable to create Game %s", e.getMessage()));
         }
-        return ID;
+        return id;
     }
 
     public GameData getGame(int gameID) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, jsonString FROM game WHERE gameID = ?";
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, jsonString FROM game WHERE gameID"
+                    + " = ?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         String json = rs.getString("jsonString");
                         ChessGame game = new Gson().fromJson(json, ChessGame.class);
-                        return new GameData(rs.getInt("gameID"), rs.getString( "whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), game);
+                        return new GameData(rs.getInt("gameID"), rs.getString( "whiteUsername"),
+                                rs.getString("blackUsername"), rs.getString("gameName"), game);
                     }
                 } catch (SQLException ex) {
                     throw new DataAccessException(String.format("Error accessing game data: %s", ex.getMessage()));
@@ -72,7 +75,9 @@ public class SqlGameDao implements IGameDao{
                     while (rs.next()) {
                         String json = rs.getString("jsonString");
                         ChessGame game = new Gson().fromJson(json, ChessGame.class);
-                        games.add(new GameData(rs.getInt("gameID"), rs.getString( "whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), game));
+                        games.add(new GameData(rs.getInt("gameID"),
+                                rs.getString( "whiteUsername"), rs.getString("blackUsername"),
+                                rs.getString("gameName"), game));
                     }
                 } catch (SQLException ex) {
                     throw new DataAccessException(String.format("Error accessing game data: %s", ex.getMessage()));
@@ -85,7 +90,8 @@ public class SqlGameDao implements IGameDao{
     }
     public void updateGame(GameData game) throws DataAccessException{
         var statement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, jsonString = ? WHERE gameID = ?";
-        try (var connection = DatabaseManager.getConnection(); var preparedStatement = connection.prepareStatement(statement)) {
+        try (var connection = DatabaseManager.getConnection();
+             var preparedStatement = connection.prepareStatement(statement)) {
             preparedStatement.setString(1, game.whiteUsername());
             preparedStatement.setString(2, game.blackUsername());
             String json = new Gson().toJson(game.game());
@@ -102,7 +108,8 @@ public class SqlGameDao implements IGameDao{
         // SQL string
         String insert = "TRUNCATE TABLE game";
         // open connection
-        try (var connection = DatabaseManager.getConnection(); var preparedStatement = connection.prepareStatement(insert)) {
+        try (var connection = DatabaseManager.getConnection(); var preparedStatement
+                = connection.prepareStatement(insert)) {
             // prepare statement
             preparedStatement.executeUpdate();
             //execute
