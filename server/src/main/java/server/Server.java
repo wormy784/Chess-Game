@@ -1,8 +1,6 @@
 package server;
 
-import dataaccess.AuthDao;
-import dataaccess.GameDao;
-import dataaccess.UserDao;
+import dataaccess.*;
 import io.javalin.*;
 import server.handler.*;
 import service.ClearService;
@@ -11,28 +9,29 @@ import service.UserService;
 
 
 public class Server {
-    UserDao userDao = new UserDao();
-    AuthDao authDao = new AuthDao();
-    GameDao gameDao = new GameDao();
+    SqlUserDao userDao = new SqlUserDao();
+    SqlAuthDao authDao = new SqlAuthDao();
+    SqlGameDao gameDao = new SqlGameDao();
     private final Javalin javalin;
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         GameService gameService = new GameService(gameDao, authDao);
         UserService userService = new UserService(userDao, authDao);
+        ClearService clearService = new ClearService(userDao, authDao, gameDao);
         // Register your endpoints and exception handlers here.
 
         //clear
-        ClearHandler clearHandler = new ClearHandler(new ClearService(userDao, authDao, gameDao));
+        ClearHandler clearHandler = new ClearHandler(clearService);
         javalin.delete("/db", clearHandler::clear);
         //register
-        RegisterHandler registerHandler = new RegisterHandler(new UserService(userDao, authDao));
+        RegisterHandler registerHandler = new RegisterHandler(userService);
         javalin.post("/user", registerHandler::register);
         // login
-        LoginHandler loginHandler = new LoginHandler(new UserService(userDao, authDao));
+        LoginHandler loginHandler = new LoginHandler(userService);
         javalin.post("/session", loginHandler::login);
         // logout
-        LogoutHandler logoutHandler = new LogoutHandler(new UserService(userDao, authDao));
+        LogoutHandler logoutHandler = new LogoutHandler(userService);
         javalin.delete("/session", logoutHandler::logout);
         // create game
         CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
@@ -48,8 +47,15 @@ public class Server {
 
     }
 
-    public int run(int desiredPort) {
-        javalin.start(desiredPort);
+    public int run(int desiredPort) throws DataAccessException {
+        try {
+            //create database
+            new SqlSetup();
+            javalin.start(desiredPort);
+        } catch (DataAccessException e) {
+            System.out.printf("Failed to initialize database: %s%n", e.getMessage());
+            throw e;
+        }
         return javalin.port();
     }
 

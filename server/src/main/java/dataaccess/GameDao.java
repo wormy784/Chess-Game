@@ -4,7 +4,7 @@ import model.GameData;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class GameDao {
+public class GameDao implements IGameDao{
     private int nextGameID = 1;
     // hashmap to store games
     private final HashMap<Integer, GameData> games = new HashMap<>();

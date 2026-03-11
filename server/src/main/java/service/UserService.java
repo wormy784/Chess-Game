@@ -5,11 +5,11 @@ import model.*;
 import java.util.UUID;
 public class UserService {
     // add fields for user and authdao
-    private UserDao userDao;
-    private AuthDao authDao;
+    private IUserDao userDao;
+    private IAuthDao authDao;
 
     // constructor
-    public UserService(UserDao userDao, AuthDao authDao) {
+    public UserService(IUserDao userDao, IAuthDao authDao) {
         this.userDao = userDao;
         this.authDao = authDao;
     }
@@ -38,7 +38,7 @@ public class UserService {
     public AuthData login(String username, String password) throws DataAccessException {
         // check if username is null or password doesn't match
         // 401
-        if (!userDao.verify(username, password)) {
+        if (!userDao.verifyUser(username, password)) {
             throw new DataAccessException("Error: unauthorized");
         }
         // generate new authtoken

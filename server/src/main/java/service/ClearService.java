@@ -2,12 +2,12 @@ package service;
 import dataaccess.*;
 public class ClearService {
     // add three fields (users, games, authTokens)
-    private UserDao userDao;
-    private AuthDao authDao;
-    private GameDao gameDao;
+    private IUserDao userDao;
+    private IAuthDao authDao;
+    private IGameDao gameDao;
 
     //add constructor
-    public ClearService(UserDao userDao, AuthDao authDao, GameDao gameDao) {
+    public ClearService(IUserDao userDao, IAuthDao authDao, IGameDao gameDao) {
         this.userDao = userDao;
         this.authDao = authDao;
         this.gameDao = gameDao;

@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
-public class SqlUserDao {
+public class SqlUserDao implements IUserDao {
     // translate user to sql version
 
     public boolean verifyUser(String username, String providedClearTextPassword) throws DataAccessException {
@@ -71,7 +71,7 @@ public class SqlUserDao {
         }
     }
 
-    public void clearUser() throws DataAccessException {
+    public void clear() throws DataAccessException {
         // SQL string
         String insert = "TRUNCATE TABLE user";
         // open connection

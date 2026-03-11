@@ -1,7 +1,7 @@
 package dataaccess;
 import java.util.HashMap;
 import model.AuthData;
-public class AuthDao {
+public class AuthDao implements IAuthDao{
     //hashmap to store auth data
     private final HashMap<String, AuthData> authTokens = new HashMap<>();
 

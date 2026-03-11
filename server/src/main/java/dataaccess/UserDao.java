@@ -2,14 +2,14 @@ package dataaccess;
 
 import model.UserData;
 import java.util.HashMap;
-public class UserDao {
+public class UserDao implements IUserDao{
 
     private final HashMap<String, UserData> users = new HashMap<>();
     public void createUser(UserData u) throws DataAccessException{
         users.put(u.username(), u);
     }
 
-    public boolean verify(String username, String password) throws DataAccessException{
+    public boolean verifyUser(String username, String password) throws DataAccessException{
         // get user
         var user = getUser(username);
         //check if user exists

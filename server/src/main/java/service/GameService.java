@@ -7,10 +7,10 @@ import java.util.Objects;
 
 public class GameService {
     // add fields for game and authdao
-    private GameDao gameDao;
-    private AuthDao authDao;
+    private IGameDao gameDao;
+    private IAuthDao authDao;
 
-    public GameService(GameDao gameDao, AuthDao authDao) {
+    public GameService(IGameDao gameDao, IAuthDao authDao) {
         this.gameDao = gameDao;
         this.authDao = authDao;
     }

@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class SqlAuthDao {
+public class SqlAuthDao implements IAuthDao{
     // translate auth to sql version
 
     public void createAuth(AuthData auth) throws DataAccessException {
@@ -57,7 +57,7 @@ public class SqlAuthDao {
         }
     }
 
-    public void clearAuth() throws DataAccessException {
+    public void clear() throws DataAccessException {
         // SQL string
         String insert = "TRUNCATE TABLE auth";
         // open connection

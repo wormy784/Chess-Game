@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.sql.Statement;
 
-public class SqlGameDao {
+public class SqlGameDao implements IGameDao{
     // translate Game to sql version
 
     public int createGame(GameData game) throws DataAccessException {
@@ -98,7 +98,7 @@ public class SqlGameDao {
         }
     }
 
-    public void clearGame() throws DataAccessException {
+    public void clear() throws DataAccessException {
         // SQL string
         String insert = "TRUNCATE TABLE game";
         // open connection
