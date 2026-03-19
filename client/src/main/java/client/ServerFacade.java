@@ -1,0 +1,111 @@
+package client;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+import com.google.gson.Gson;
+import model.*;
+
+
+
+public class ServerFacade {
+    private final HttpClient client = HttpClient.newHttpClient();
+    private final String serverUrl;
+
+    public ServerFacade(int port) {
+        serverUrl = "http://localhost:" + port;
+    }
+
+    public AuthData register(RegisterRequest request) throws Exception {
+        var registerRequest = buildRequest("POST", "/user", request, null);
+        var registerResponse = sendRequest(registerRequest);
+        return handleResponse(registerResponse, AuthData.class);
+    }
+
+    public AuthData login(LoginRequest request) throws Exception {
+        var loginRequest = buildRequest("POST", "/session", request, null);
+        var loginResponse = sendRequest(loginRequest);
+        return handleResponse(loginResponse, AuthData.class);
+    }
+
+    public void logout(AuthData authToken) throws Exception {
+        var path = ("/session");
+        var logoutRequest = buildRequest("DELETE", path, null, authToken);
+        var response = sendRequest(logoutRequest);
+        handleResponse(response, null);
+    }
+
+    public CreateGameResult createGame(CreateGameRequest createGame, AuthData authToken) {
+        var createRequest = buildRequest("POST", "/game", createGame, authToken);
+        var createResponse = sendRequest(createRequest);
+        return handleResponse(createResponse, CreateGameResult.class);
+    }
+
+    public ListGamesResult listGames(AuthData authToken) {
+        var request = buildRequest("GET", "/game", null, authToken);
+        var response = sendRequest(request);
+        return handleResponse(response, ListGamesResult.class);
+    }
+
+    public void joinGame(JoinRequest request, AuthData authToken) {
+        var joinRequest = buildRequest("POST", "/game", request, authToken);
+        var joinResponse = sendRequest(joinRequest);
+        handleResponse(joinResponse, null);
+    }
+
+    private HttpRequest buildRequest(String method, String path, Object body, AuthData authToken) {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + path))
+                .method(method, makeRequestBody(body));
+        if (body != null) {
+            request.setHeader("Content-Type", "application/json");
+        }
+        if (authToken != null) {
+            request.header("authorization", authToken.authToken());
+        }
+        return request.build();
+    }
+
+    private HttpRequest.BodyPublisher makeRequestBody(Object request) {
+        if (request != null) {
+            return HttpRequest.BodyPublishers.ofString(new Gson().toJson(request));
+        } else {
+            return HttpRequest.BodyPublishers.noBody();
+        }
+    }
+    private HttpResponse<String> sendRequest(HttpRequest request) throws Exception {
+        try {
+            return client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception ex) {
+            throw new Exception(Exception.Code.ServerError, ex.getMessage());
+        }
+    }
+
+    private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws Exception {
+        var status = response.statusCode();
+        if (!isSuccessful(status)) {
+            var body = response.body();
+            if (body != null) {
+                throw Exception.fromJson(body);
+            }
+
+            throw new Exception(Exception.fromHttpStatusCode(status), "other failure: " + status);
+        }
+
+        if (responseClass != null) {
+            return new Gson().fromJson(response.body(), responseClass);
+        }
+
+        return null;
+    }
+    private boolean isSuccessful(int status) {
+        return status / 100 == 2;
+    }
+
+
+
+
+
+}
