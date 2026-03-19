@@ -1,9 +1,11 @@
 package client;
 
+import model.AuthData;
+import model.RegisterRequest;
 import org.junit.jupiter.api.*;
 import server.Server;
-import server.handler.ClearHandler;
-import service.ClearService;
+
+
 
 
 public class ServerFacadeTests {
@@ -21,7 +23,7 @@ public class ServerFacadeTests {
 
     @BeforeEach
     void clearDatabase() throws Exception {
-        ClearService
+        facade.clear();
     }
 
     @AfterAll
@@ -31,8 +33,17 @@ public class ServerFacadeTests {
 
 
     @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
+    public void registerPosTest() throws Exception {
+        RegisterRequest request = new RegisterRequest("username", "password123", "email@gmail.com");
+        AuthData testResult = facade.register(request);
+        Assertions.assertNotNull(testResult);
     }
 
+    @Test
+    public void registerNegTest() throws Exception {
+        RegisterRequest request = new RegisterRequest("username", "password123", "email@gmail.com");
+        facade.register(request);
+        new RegisterRequest("username", "password123", "email@gmail.com");
+        Assertions.assertThrows(Exception.class, () -> facade.register(request));
+    }
 }

@@ -18,6 +18,13 @@ public class ServerFacade {
         serverUrl = "http://localhost:" + port;
     }
 
+    public void clear() throws Exception {
+        var path = ("/db");
+        var deleteRequest = buildRequest("DELETE", path, null, null);
+        var response = sendRequest(deleteRequest);
+        handleResponse(response, null);
+    }
+
     public AuthData register(RegisterRequest request) throws Exception {
         var registerRequest = buildRequest("POST", "/user", request, null);
         var registerResponse = sendRequest(registerRequest);
@@ -37,19 +44,19 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
-    public CreateGameResult createGame(CreateGameRequest createGame, AuthData authToken) {
+    public CreateGameResult createGame(CreateGameRequest createGame, AuthData authToken) throws Exception {
         var createRequest = buildRequest("POST", "/game", createGame, authToken);
         var createResponse = sendRequest(createRequest);
         return handleResponse(createResponse, CreateGameResult.class);
     }
 
-    public ListGamesResult listGames(AuthData authToken) {
+    public ListGamesResult listGames(AuthData authToken) throws Exception{
         var request = buildRequest("GET", "/game", null, authToken);
         var response = sendRequest(request);
         return handleResponse(response, ListGamesResult.class);
     }
 
-    public void joinGame(JoinRequest request, AuthData authToken) {
+    public void joinGame(JoinRequest request, AuthData authToken) throws Exception {
         var joinRequest = buildRequest("POST", "/game", request, authToken);
         var joinResponse = sendRequest(joinRequest);
         handleResponse(joinResponse, null);
@@ -79,7 +86,7 @@ public class ServerFacade {
         try {
             return client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception ex) {
-            throw new Exception(Exception.Code.ServerError, ex.getMessage());
+            throw new Exception(ex.getMessage());
         }
     }
 
@@ -88,10 +95,10 @@ public class ServerFacade {
         if (!isSuccessful(status)) {
             var body = response.body();
             if (body != null) {
-                throw Exception.fromJson(body);
+                throw new Exception(body);
             }
 
-            throw new Exception(Exception.fromHttpStatusCode(status), "other failure: " + status);
+            throw new Exception("other failure: " + status);
         }
 
         if (responseClass != null) {
