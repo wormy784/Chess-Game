@@ -142,11 +142,32 @@ public class ServerFacadeTests {
         Assertions.assertThrows(Exception.class, () -> facade.listGames(fakeToken));
     }
 
+    @Test
+    public void joinGamePosTest() throws Exception {
+        //register request
+        RegisterRequest request = new RegisterRequest("username", "password123", "email@gmail.com");
+        // register request
+        facade.register(request);
+        // login request
+        LoginRequest request2 = new LoginRequest("username", "password123");
+        // login with username
+        AuthData authToken = facade.login(request2);
+        CreateGameRequest gameName = new CreateGameRequest("FortniteBattlePass");
+        CreateGameResult gameID = facade.createGame(gameName, authToken);
+        System.out.println(gameID.gameID());
+        JoinRequest joinRequest = new JoinRequest("WHITE", gameID.gameID());
+        // assert it doesnt throw
+        System.out.println(joinRequest);
+        System.out.println(authToken);
+        Assertions.assertDoesNotThrow(() -> facade.joinGame(joinRequest, authToken));
+    }
 
-
-
-
-
-
-
+    @Test
+    public void joinGameNegTest() throws Exception {
+        // try to join a game that doesn't exist with fake id
+        AuthData fakeToken = new AuthData("token", "jimmyjohn");
+        JoinRequest joinRequest = new JoinRequest("WHITE", 66);
+        // assert it doesnt throw
+        Assertions.assertThrows(Exception.class, () -> facade.joinGame(joinRequest, fakeToken));
+    }
 }
