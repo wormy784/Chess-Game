@@ -154,11 +154,11 @@ public class ServerFacadeTests {
         AuthData authToken = facade.login(request2);
         CreateGameRequest gameName = new CreateGameRequest("FortniteBattlePass");
         CreateGameResult gameID = facade.createGame(gameName, authToken);
-        System.out.println(gameID.gameID());
+//      //System.out.println(gameID.gameID());
         JoinRequest joinRequest = new JoinRequest("WHITE", gameID.gameID());
         // assert it doesnt throw
-        System.out.println(joinRequest);
-        System.out.println(authToken);
+//        System.out.println(joinRequest);
+//        System.out.println(authToken);
         Assertions.assertDoesNotThrow(() -> facade.joinGame(joinRequest, authToken));
     }
 
