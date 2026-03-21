@@ -29,24 +29,24 @@ public class PostloginUI {
             case "create" -> {
                 if (parts.length < 2) {
                     System.out.println("Please provide a name fo yo game.");
+                    return false;
                 }
                 createGameInfo(parts[1]);
-                break;
             }
             case "list" -> listGamesInfo();
             case "join" -> {
                 if (parts.length < 3) {
                     System.out.println("Please provide a name for the game you want to join and a team color.");
+                    return false;
                 }
                 playGameInfo(Integer.parseInt(parts[1]), parts[2]);
-                break;
             }
             case "observe" -> {
                 if (parts.length < 2) {
                     System.out.println("Please provide a name for the game you want to observe.");
+                    return false;
                 }
                 observeGameInfo(Integer.parseInt(parts[1]));
-                break;
             }
             default -> helpInfo();
         }
@@ -96,7 +96,7 @@ public class PostloginUI {
         try {
             var games = facade.listGames(authToken);
             for (var game : games.games()){
-                System.out.println(game);
+                System.out.println(game.gameName());
                 }
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
