@@ -79,44 +79,35 @@ public class BoardDrawer {
 
         return EscapeSequences.EMPTY;
     }
+
+    private void drawRow(int i, int jBegin, int jEnd, int jInc) {
+        System.out.print(i + " ");
+        for (int j = jBegin; jInc > 0 ? j <= jEnd : j >= jEnd; j += jInc) {
+            if ((i + j) % 2 == 0) {
+                System.out.print(EscapeSequences.SET_BG_COLOR_BLACK);
+            } else {
+                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE);
+            }
+            getColor(i);
+            System.out.print(getPiece(i, j));
+            System.out.print(EscapeSequences.RESET_TEXT_COLOR);
+        }
+        System.out.print(EscapeSequences.RESET_BG_COLOR);
+        System.out.print(" "+ i);
+        System.out.print("\n");
+    }
     public void drawBoard(boolean whitePerspective) {
         if (whitePerspective) {
             System.out.print("   a  b  c  d  e  f  g  h  \n");
             for (int i = 8; i >= 1; i--) {
-                System.out.print(i + " ");
-                for (int j = 1; j <= 8; j++) {
-                    if ((i + j) % 2 == 0) {
-                        System.out.print(EscapeSequences.SET_BG_COLOR_BLACK);
-                    } else {
-                        System.out.print(EscapeSequences.SET_BG_COLOR_WHITE);
-                    }
-                    getColor(i);
-                    System.out.print(getPiece(i, j));
-                    System.out.print(EscapeSequences.RESET_TEXT_COLOR);
-                }
-                System.out.print(EscapeSequences.RESET_BG_COLOR);
-                System.out.print(" "+ i);
-                System.out.print("\n");
+                drawRow(i, 1, 8 , 1);
             }
             System.out.print("   a  b  c  d  e  f  g  h  \n");
 
         } else {
             System.out.print("   h  g  f  e  d  c  b  a  \n");
             for (int i = 1; i <= 8; i++) {
-                System.out.print(i + " ");
-                for (int j = 8; j >= 1; j--) {
-                    if ((i + j) % 2 == 0) {
-                        System.out.print(EscapeSequences.SET_BG_COLOR_BLACK);
-                    } else {
-                        System.out.print(EscapeSequences.SET_BG_COLOR_WHITE);
-                    }
-                    getColor(i);
-                    System.out.print(getPiece(i, j));
-                    System.out.print(EscapeSequences.RESET_TEXT_COLOR);
-                }
-                System.out.print(EscapeSequences.RESET_BG_COLOR);
-                System.out.print(" " + i);
-                System.out.print("\n");
+                drawRow(i, 8, 1, -1);
             }
             System.out.print("   h  g  f  e  d  c  b  a  \n");
         }

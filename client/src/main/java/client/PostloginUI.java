@@ -130,6 +130,13 @@ public class PostloginUI {
     }
 
     private void observeGameInfo(int gameNumber) {
+        if (gamesList.isEmpty()) {
+            System.out.println("Please make sure games are available to observe.");
+        }
+        if (gameNumber < 1 || gameNumber > gamesList.size()) {
+            System.out.println("Invalid game number.");
+            return;
+        }
         BoardDrawer drawn = new BoardDrawer();
         drawn.drawBoard(true);
     }

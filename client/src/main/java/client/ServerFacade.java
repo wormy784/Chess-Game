@@ -63,11 +63,6 @@ public class ServerFacade {
         handleResponse(joinResponse, null);
     }
 
-    public void observeGame(int gameID, AuthData authToken) throws Exception {
-        var request = buildRequest("PUT", "/game", new JoinRequest(null, gameID), authToken);
-        var response = sendRequest(request);
-        handleResponse(response, null);
-    }
 
     private HttpRequest buildRequest(String method, String path, Object body, AuthData authToken) {
         var request = HttpRequest.newBuilder()
