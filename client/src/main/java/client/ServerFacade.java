@@ -13,6 +13,7 @@ import model.*;
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
+    private final Gson gson = new Gson();
 
     public ServerFacade(int port) {
         serverUrl = "http://localhost:" + port;
@@ -67,7 +68,7 @@ public class ServerFacade {
                 .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(body));
         if (body != null) {
-            request.setHeader("Content-Type", "application/json");
+            request.header("Content-Type", "application/json");
         }
         if (authToken != null) {
             request.header("authorization", authToken.authToken());
@@ -95,14 +96,18 @@ public class ServerFacade {
         if (!isSuccessful(status)) {
             var body = response.body();
             if (body != null) {
-                throw new Exception(body);
+                var error = gson.fromJson(body, ErrorResponse.class);
+                var message = error.message();
+                if (message != null && message.startsWith("Error: ")) {
+                    message = message.substring(7);
+                }
+                throw new Exception(message);
             }
-
             throw new Exception("other failure: " + status);
         }
 
         if (responseClass != null) {
-            return new Gson().fromJson(response.body(), responseClass);
+            return gson.fromJson(response.body(), responseClass);
         }
 
         return null;

@@ -3,7 +3,6 @@ package server.handler;
 import service.GameService;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
-import java.util.Map;
 import com.google.gson.Gson;
 
 public class JoinHandler {
@@ -25,7 +24,7 @@ public class JoinHandler {
 
         //if color null or not one of the options then error
         //401
-        if (body == null || body.gameID() == null || body.playerColor() == null) {
+        if (body == null || body.gameID() == null) {
             ctx.status(400);
             ctx.result("{ \"message\": \"Error: bad request\" }");
             return;
@@ -37,7 +36,7 @@ public class JoinHandler {
             ctx.result("{ \"message\": \"Error: unauthorized\" }");
             return;
         }
-        if (!body.playerColor().equals("WHITE") && !body.playerColor().equals("BLACK")) {
+        if (body.playerColor() != null && !body.playerColor().equals("WHITE") && !body.playerColor().equals("BLACK")) {
             ctx.status(400);
             ctx.result("{ \"message\": \"Error: bad request\" }");
             return;

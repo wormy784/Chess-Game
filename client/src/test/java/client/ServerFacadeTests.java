@@ -157,8 +157,6 @@ public class ServerFacadeTests {
 //      //System.out.println(gameID.gameID());
         JoinRequest joinRequest = new JoinRequest("WHITE", gameID.gameID());
         // assert it doesnt throw
-//        System.out.println(joinRequest);
-//        System.out.println(authToken);
         Assertions.assertDoesNotThrow(() -> facade.joinGame(joinRequest, authToken));
     }
 

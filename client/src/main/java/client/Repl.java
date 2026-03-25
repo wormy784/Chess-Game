@@ -17,36 +17,42 @@ public class Repl {
     Scanner scanner = new Scanner(System.in) ;
 
     public void run() {
-        System.out.print("Welcome to ChessGame (its the exact same as chess but without castling and en passant" +
-                " since i don't know how to implement them!). ");
-        System.out.print("Type Help to display possible actions and get started");
+        System.out.print("Welcome to ChessGame!\n");
+        System.out.print("Type help to display possible actions and get started\n");
         PreloginUI preStuff = new PreloginUI(facade);
+        PostloginUI stuff = null;
 
         while (true) {
-            //check if person is logged in or not
-            if (authToken != null) {
-                loggedIn = true;
-            }
-            // get user input
-            String input = scanner.nextLine();
-            if (loggedIn) {
-                PostloginUI stuff = new PostloginUI(facade, authToken);
-                // pass input to postloginUI
-                var result = stuff.eval(input);
-                if (result) {
-                    loggedIn = false;
-                    authToken = null;
-                }
-            }
-            else {
-
-                // pass input into preloginUI
-                var result = preStuff.eval(input);
-                if (result != null) {
-                    authToken = result;
+            try {
+                //check if person is logged in or not
+                if (authToken != null) {
                     loggedIn = true;
                 }
+                // get user input
+                String input = scanner.nextLine();
+                if (loggedIn) {
+                    // pass input to postloginUI
+                    if (stuff != null) {
+                        var result = stuff.eval(input);
+                        if (result) {
+                            loggedIn = false;
+                            authToken = null;
+                        }
+                    }
+                }
+                else {
+                    // pass input into preloginUI
+                    var result = preStuff.eval(input);
+                    if (result != null) {
+                        authToken = result;
+                        loggedIn = true;
+                        stuff = new PostloginUI(facade, authToken);
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
             }
+
         }
     }
 

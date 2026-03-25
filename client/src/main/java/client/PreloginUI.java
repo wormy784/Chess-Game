@@ -61,7 +61,7 @@ public class PreloginUI {
         try {
             return facade.login(request);
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -74,7 +74,7 @@ public class PreloginUI {
         try {
             return facade.register(request);
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(e.getMessage());
             return null;
         }
 

@@ -1,6 +1,7 @@
 package client;
 
 import model.*;
+import ui.BoardDrawer;
 
 import java.util.Scanner;
 
@@ -8,6 +9,8 @@ public class PostloginUI {
 
     private final ServerFacade facade;
     private AuthData authToken;
+
+    private java.util.List<GameData> gamesList = new java.util.ArrayList<>();
 
     public PostloginUI(ServerFacade facade, AuthData authToken) {
         this.facade = facade;
@@ -39,14 +42,22 @@ public class PostloginUI {
                     System.out.println("Please provide a name for the game you want to join and a team color.");
                     return false;
                 }
-                playGameInfo(Integer.parseInt(parts[1]), parts[2]);
+                try {
+                    playGameInfo(Integer.parseInt(parts[1]), parts[2]);
+                } catch (Exception e) {
+                    System.out.println("Please provide a valid game number.");
+                }
             }
             case "observe" -> {
                 if (parts.length < 2) {
                     System.out.println("Please provide a name for the game you want to observe.");
                     return false;
                 }
-                observeGameInfo(Integer.parseInt(parts[1]));
+                try {
+                    observeGameInfo(Integer.parseInt(parts[1]));
+                } catch (Exception e) {
+                    System.out.println("Please provide game number.");
+                }
             }
             default -> helpInfo();
         }
@@ -75,7 +86,7 @@ public class PostloginUI {
             facade.logout(authToken);
             return true;
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(e.getMessage());
             return false;
         }
     }
@@ -87,19 +98,22 @@ public class PostloginUI {
         try {
             facade.createGame(request, authToken);
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 
     private void listGamesInfo() {
         // list games
         try {
+            int count = 1;
             var games = facade.listGames(authToken);
+            gamesList = new java.util.ArrayList<>(games.games());
             for (var game : games.games()){
-                System.out.println(game.gameName());
+                System.out.println(count + ". " + game.gameName() + " Players: " +  game.whiteUsername() + " " + game.blackUsername());
+                count++;
                 }
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 
@@ -108,21 +122,25 @@ public class PostloginUI {
         // They should be able to enter the number of the desired game. Your client will need to keep track of which
         // number corresponds to which game from the last time it listed the games. Calls the server join API to join
         // the user to the game.
-        JoinRequest request = new JoinRequest(teamColor, gameNumber);
+        JoinRequest request = new JoinRequest(teamColor, gamesList.get(gameNumber - 1).gameID());
         try {
             facade.joinGame(request, authToken);
+            BoardDrawer drawn = new BoardDrawer();
+            drawn.drawBoard(teamColor.equals("WHITE"));
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(e.getMessage());
         }
 
     }
 
     private void observeGameInfo(int gameNumber) {
-        JoinRequest request = new JoinRequest(null, gameNumber);
+        JoinRequest request = new JoinRequest(null, gamesList.get(gameNumber - 1).gameID());
         try {
             facade.joinGame(request, authToken);
+            BoardDrawer drawn = new BoardDrawer();
+            drawn.drawBoard(true);
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(e.getMessage());
         }
 
     }
