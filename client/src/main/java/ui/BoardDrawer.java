@@ -86,16 +86,13 @@ public class BoardDrawer {
                 System.out.print(i + " ");
                 for (int j = 1; j <= 8; j++) {
                     if ((i + j) % 2 == 0) {
-                        System.out.print(EscapeSequences.SET_BG_COLOR_WHITE);
-                        getColor(i);
-                        System.out.print(getPiece(i, j));
-                        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
-                    } else {
                         System.out.print(EscapeSequences.SET_BG_COLOR_BLACK);
-                        getColor(i);
-                        System.out.print(getPiece(i, j));
-                        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
+                    } else {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_WHITE);
                     }
+                    getColor(i);
+                    System.out.print(getPiece(i, j));
+                    System.out.print(EscapeSequences.RESET_TEXT_COLOR);
                 }
                 System.out.print(EscapeSequences.RESET_BG_COLOR);
                 System.out.print(" "+ i);
@@ -109,16 +106,13 @@ public class BoardDrawer {
                 System.out.print(i + " ");
                 for (int j = 8; j >= 1; j--) {
                     if ((i + j) % 2 == 0) {
-                        System.out.print(EscapeSequences.SET_BG_COLOR_WHITE);
-                        getColor(i);
-                        System.out.print(getPiece(i, j));
-                        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
-                    } else {
                         System.out.print(EscapeSequences.SET_BG_COLOR_BLACK);
-                        getColor(i);
-                        System.out.print(getPiece(i, j));
-                        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
+                    } else {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_WHITE);
                     }
+                    getColor(i);
+                    System.out.print(getPiece(i, j));
+                    System.out.print(EscapeSequences.RESET_TEXT_COLOR);
                 }
                 System.out.print(EscapeSequences.RESET_BG_COLOR);
                 System.out.print(" " + i);

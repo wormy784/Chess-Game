@@ -4,17 +4,14 @@ import model.AuthData;
 import model.LoginRequest;
 import model.RegisterRequest;
 
-import java.util.Scanner;
 
 public class PreloginUI {
 
     private final ServerFacade facade;
-    private AuthData authToken;
 
     public PreloginUI(ServerFacade facade) {
         this.facade = facade;
     }
-    Scanner scanner = new Scanner(System.in) ;
 
     public AuthData eval(String input) {
         var parts = input.split(" ");
@@ -54,12 +51,13 @@ public class PreloginUI {
     }
 
     private AuthData loginInfo(String username, String password) {
-        //prompt user to input login information, calls server login api to login the user.
-        // when logged in, client should transition to postlogin UI
-        // System.out.println("Please enter a username and password: ");
+        //prompt user to input login information, calls server login api to log in the user.
+        // when logged in, client should transition to post login UI
         LoginRequest request = new LoginRequest(username, password);
         try {
-            return facade.login(request);
+            AuthData auth = facade.login(request);
+            System.out.println("Logged in successfully.");
+            return auth;
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
@@ -69,10 +67,11 @@ public class PreloginUI {
     private AuthData registerInfo(String username, String password, String email) {
         // prompt user to input registration information. calls the server register API to register and login the user.
         // if registered, client should be logged in and transition to postlogin UI
-        //System.out.println("Please enter a username, password, and email: ");
         RegisterRequest request = new RegisterRequest(username, password, email);
         try {
-            return facade.register(request);
+            AuthData auth = facade.register(request);
+            System.out.println("Registered and logged in successfully.");
+            return auth;
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;

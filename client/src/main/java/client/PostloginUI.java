@@ -2,9 +2,6 @@ package client;
 
 import model.*;
 import ui.BoardDrawer;
-
-import java.util.Scanner;
-
 public class PostloginUI {
 
     private final ServerFacade facade;
@@ -16,8 +13,6 @@ public class PostloginUI {
         this.facade = facade;
         this.authToken = authToken;
     }
-    Scanner scanner = new Scanner(System.in) ;
-
     public boolean eval(String input) {
         var parts = input.split(" ");
         switch (parts[0]) {
@@ -84,6 +79,7 @@ public class PostloginUI {
         // logout
         try {
             facade.logout(authToken);
+            System.out.println("Logged out successfully.");
             return true;
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -134,9 +130,8 @@ public class PostloginUI {
     }
 
     private void observeGameInfo(int gameNumber) {
-        JoinRequest request = new JoinRequest(null, gamesList.get(gameNumber - 1).gameID());
         try {
-            facade.joinGame(request, authToken);
+            facade.observeGame(gamesList.get(gameNumber - 1).gameID(), authToken);
             BoardDrawer drawn = new BoardDrawer();
             drawn.drawBoard(true);
         } catch (Exception e) {
