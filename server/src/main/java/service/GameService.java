@@ -51,7 +51,7 @@ public class GameService {
         }
         //make sure color is real color
         if (playerColor != null && !Objects.equals(playerColor, "WHITE") && (!Objects.equals(playerColor, "BLACK"))) {
-            throw new DataAccessException("Error; not a valid team color");
+            throw new DataAccessException("Error: bad request");
         }
         // allow observers
         if (playerColor == null) {

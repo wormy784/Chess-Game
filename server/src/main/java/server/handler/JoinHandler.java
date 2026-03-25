@@ -36,7 +36,8 @@ public class JoinHandler {
             ctx.result("{ \"message\": \"Error: unauthorized\" }");
             return;
         }
-        if (body.playerColor() != null && !body.playerColor().equals("WHITE") && !body.playerColor().equals("BLACK")) {
+        if (body.playerColor() == null || body.playerColor().isBlank() ||
+                (!body.playerColor().equals("WHITE") && !body.playerColor().equals("BLACK"))) {
             ctx.status(400);
             ctx.result("{ \"message\": \"Error: bad request\" }");
             return;
