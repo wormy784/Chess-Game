@@ -23,8 +23,8 @@ public class JoinHandler {
         var body = gson.fromJson(ctx.body(), JoinRequest.class);
 
         //if color null or not one of the options then error
-        //401
-        if (body == null || body.gameID() == null) {
+        //400
+        if (body == null || body.gameID() == null || body.playerColor() == null || body.playerColor().isBlank()) {
             ctx.status(400);
             ctx.result("{ \"message\": \"Error: bad request\" }");
             return;
@@ -36,7 +36,7 @@ public class JoinHandler {
             ctx.result("{ \"message\": \"Error: unauthorized\" }");
             return;
         }
-        if(body.playerColor() != null && !body.playerColor().equals("WHITE") && !body.playerColor().equals("BLACK")) {
+        if (!body.playerColor().equals("WHITE") && !body.playerColor().equals("BLACK")) {
             ctx.status(400);
             ctx.result("{ \"message\": \"Error: bad request\" }");
             return;

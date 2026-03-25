@@ -130,14 +130,8 @@ public class PostloginUI {
     }
 
     private void observeGameInfo(int gameNumber) {
-        try {
-            facade.observeGame(gamesList.get(gameNumber - 1).gameID(), authToken);
-            BoardDrawer drawn = new BoardDrawer();
-            drawn.drawBoard(true);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
+        BoardDrawer drawn = new BoardDrawer();
+        drawn.drawBoard(true);
     }
 
 }
