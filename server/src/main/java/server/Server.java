@@ -2,6 +2,7 @@ package server;
 
 import dataaccess.*;
 import io.javalin.*;
+import io.javalin.websocket.WsConnectContext;
 import server.handler.*;
 import service.ClearService;
 import service.GameService;
@@ -43,7 +44,12 @@ public class Server {
         ListHandler listHandler = new ListHandler(gameService);
         javalin.get("/game", listHandler::list);
 
-
+        WebSocketHandler websocketHandler = new WebSocketHandler(gameService);
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(websocketHandler::onConnect);
+            ws.onMessage(websocketHandler::onMessage);
+            ws.onClose(websocketHandler::onClose);
+        });
 
     }
 
