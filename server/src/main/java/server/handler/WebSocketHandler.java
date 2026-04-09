@@ -1,5 +1,6 @@
 package server.handler;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.IAuthDao;
@@ -38,7 +39,7 @@ public class WebSocketHandler {
 
 
         // switch on commandType and route to other methods
-        switch (command.commandType) {
+        switch (command.getCommandType()) {
             case CONNECT: handleConnect(context, command);
             break;
             case MAKE_MOVE: break;
@@ -50,27 +51,27 @@ public class WebSocketHandler {
 
     private void handleConnect(WsMessageContext context, UserGameCommand command) {
         // add session to map with gameID
-        if (gameSessions.containsKey(command.gameID)) {
-            gameSessions.get(command.gameID);
+        if (gameSessions.containsKey(command.getGameID())) {
+            gameSessions.get(command.getGameID());
 
         } else {
             // new hashset
-            gameSessions.put(command.gameID, new HashSet<>());
+            gameSessions.put(command.getGameID(), new HashSet<>());
         }
-        gameSessions.get(command.gameID).add(context);
+        gameSessions.get(command.getGameID()).add(context);
 
         // send load game message to client
         try {
-            var game = gameService.getGame(command.authToken, command.gameID);
+            var game = gameService.getGame(command.getAuthToken(), command.getGameID());
             var message = new LoadGameMessage(game);
             var json = gson.toJson(message);
             context.send(json);
             // send notification to other clients
-            for (WsContext session : gameSessions.get(command.gameID)) {
+            for (WsContext session : gameSessions.get(command.getGameID())) {
                 if (session == context) {
                     continue;
                 }
-                var username = authDao.getAuth(command.authToken).username();
+                var username = authDao.getAuth(command.getAuthToken()).username();
                 var notifMessage = new NotificationMessage(username + " joined the game");
                 var notifJson = gson.toJson(notifMessage);
                 session.send(notifJson);
@@ -79,6 +80,19 @@ public class WebSocketHandler {
         } catch (DataAccessException e) {
             context.send(gson.toJson(new ErrorMessage("Error: " + e.getMessage())));
         }
+    }
+
+    private void handleMakeMove(WsMessageContext context, UserGameCommand command) {
+        // verify move
+
+        // update game in database
+
+        // server send LOAD_GAME message to all clients
+
+        // server send Notification message ot all other clients about what move was made
+
+        // if move is a check, checkmate or stalemate, server send notification message to all clients
+
     }
     private void onClose(WsCloseContext context) {
     }
