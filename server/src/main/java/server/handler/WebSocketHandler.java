@@ -160,6 +160,18 @@ public class WebSocketHandler {
             }
 
     }
+
+    private void handleLeave() {
+        // remove session from game session
+
+        // send notif to all other clients that the player left (or rage-quit)
+    }
+
+    private void handleResign() {
+        // mark game as over in db
+
+        // send notif to other clients player resigned (mad cuz bad)
+    }
     private void onClose(WsCloseContext context) {
     }
 }
