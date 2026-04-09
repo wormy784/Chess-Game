@@ -44,7 +44,7 @@ public class Server {
         ListHandler listHandler = new ListHandler(gameService);
         javalin.get("/game", listHandler::list);
 
-        WebSocketHandler websocketHandler = new WebSocketHandler(gameService);
+        WebSocketHandler websocketHandler = new WebSocketHandler(gameService, authDao);
         javalin.ws("/ws", ws -> {
             ws.onConnect(websocketHandler::onConnect);
             ws.onMessage(websocketHandler::onMessage);

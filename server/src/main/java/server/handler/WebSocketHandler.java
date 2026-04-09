@@ -1,6 +1,8 @@
 package server.handler;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
+import dataaccess.IAuthDao;
 import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsConnectContext;
 import io.javalin.websocket.WsMessageContext;
@@ -12,13 +14,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.HashMap;
 import io.javalin.websocket.WsContext;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 
 public class WebSocketHandler {
     private final Gson gson = new Gson();
     private final Map<Integer, Set<WsContext>> gameSessions = new HashMap<>();
     private final GameService gameService;
-    public WebSocketHandler(GameService gameService) {
+    private final IAuthDao authDao;
+    public WebSocketHandler(GameService gameService, IAuthDao authDao) {
         this.gameService = gameService;
+        this.authDao = authDao;
     }
     private void onConnect(WsConnectContext context) {
 
@@ -53,13 +60,24 @@ public class WebSocketHandler {
         gameSessions.get(command.gameID).add(context);
 
         // send load game message to client
-        context.send("Loading");
-        // send notification to other clients
-        for (WsContext session : gameSessions.get(command.gameID)) {
-            if (session == context) {
-                continue;
+        try {
+            var game = gameService.getGame(command.authToken, command.gameID);
+            var message = new LoadGameMessage(game);
+            var json = gson.toJson(message);
+            context.send(json);
+            // send notification to other clients
+            for (WsContext session : gameSessions.get(command.gameID)) {
+                if (session == context) {
+                    continue;
+                }
+                var username = authDao.getAuth(command.authToken).username();
+                var notifMessage = new NotificationMessage(username + " joined the game");
+                var notifJson = gson.toJson(notifMessage);
+                session.send(notifJson);
+
             }
-            session.send("Loading"); to each cleint?
+        } catch (DataAccessException e) {
+            context.send(gson.toJson(new ErrorMessage("Error: " + e.getMessage())));
         }
     }
     private void onClose(WsCloseContext context) {
