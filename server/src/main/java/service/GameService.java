@@ -109,4 +109,18 @@ public class GameService {
         gameDao.updateGame(game);
         return game;
     }
+
+    public GameData resignGame(String authToken, int gameID) throws DataAccessException{
+        // verify auth token
+        var auth = authDao.getAuth(authToken);
+        if (auth == null) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+        // get game by gameid
+        var game = getGame(authToken, gameID);
+        game.game().setGameOver(true);
+        // save updated game back to database bro
+        gameDao.updateGame(game);
+        return game;
+    }
 }
