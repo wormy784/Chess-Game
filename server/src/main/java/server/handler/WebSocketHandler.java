@@ -50,8 +50,10 @@ public class WebSocketHandler {
                 MakeMoveCommand makeMoveCommand = gson.fromJson(jsonString, MakeMoveCommand.class);
                 handleMakeMove(context, makeMoveCommand);
             break;
-            case LEAVE: break;
-            case RESIGN: break;
+            case LEAVE: handleLeave(context, command);
+            break;
+            case RESIGN: handleResign(context, command);
+            break;
         }
 
     }
@@ -161,16 +163,43 @@ public class WebSocketHandler {
 
     }
 
-    private void handleLeave() {
-        // remove session from game session
-
-        // send notif to all other clients that the player left (or rage-quit)
+    private void handleLeave(WsMessageContext context, UserGameCommand command) {
+        try {
+            // remove session from game session
+            gameSessions.get(command.getGameID()).remove(context);
+            // send notif to all other clients that the player left (or rage-quit)
+            for (WsContext session : gameSessions.get(command.getGameID())) {
+                var username = authDao.getAuth(command.getAuthToken()).username();
+                var notifMessage = new NotificationMessage(username + "has left the game.");
+                var notifJson = gson.toJson(notifMessage);
+                // server send Notification message ot all other clients about what move was made
+                if (session != context) {
+                    session.send(notifJson);
+                }
+            }
+        } catch (DataAccessException e) {
+            context.send(gson.toJson(new ErrorMessage("Error: " + e.getMessage())));
+        }
     }
 
-    private void handleResign() {
-        // mark game as over in db
+    private void handleResign(WsMessageContext context, UserGameCommand command) {
+        try {
+            // mark game as over in db
+            var game = gameService.resignGame(command.getAuthToken(), command.getGameID());
+            // grab username
+            var username = authDao.getAuth(command.getAuthToken()).username();
+            // send notif to other clients player resigned (mad cuz bad)
+            for (WsContext session : gameSessions.get(command.getGameID())) {
 
-        // send notif to other clients player resigned (mad cuz bad)
+                var notifMessage = new NotificationMessage(username + "has resigned!");
+                var notifJson = gson.toJson(notifMessage);
+                // server send Notification message ot all other clients about what move was made
+                session.send(notifJson);
+            }
+        } catch (DataAccessException e) {
+            context.send(gson.toJson(new ErrorMessage("Error: " + e.getMessage())));
+        }
+
     }
     private void onClose(WsCloseContext context) {
     }

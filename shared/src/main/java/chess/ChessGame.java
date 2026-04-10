@@ -36,6 +36,13 @@ public class ChessGame {
     public void setTeamTurn(TeamColor team) {
         turn = team;
     }
+    private boolean gameOver = false;
+    public boolean isGameOver() {
+        return gameOver;
+    }
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
 
     @Override
     public boolean equals(Object o) {
