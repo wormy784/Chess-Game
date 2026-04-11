@@ -34,7 +34,7 @@ public class GameplayUI implements MessageHandler {
             case "resign" -> resign();
             case "leave" -> leave();
             case "highlight" -> highlight();
-            default -> helpInfo();
+            default -> help();
         }
         return false;
     }
@@ -51,5 +51,8 @@ public class GameplayUI implements MessageHandler {
 
     }
 
+    public void setWs(WebSocketFacade ws) {
+        this.command = ws;
+    }
 
 }

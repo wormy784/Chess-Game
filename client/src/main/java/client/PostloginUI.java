@@ -4,6 +4,8 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import model.*;
 import ui.BoardDrawer;
+import websocket.commands.UserGameCommand;
+
 public class PostloginUI {
 
     private final ServerFacade facade;
@@ -123,9 +125,21 @@ public class PostloginUI {
         JoinRequest request = new JoinRequest(teamColor, gamesList.get(gameNumber - 1).gameID());
         try {
             facade.joinGame(request, authToken);
+            // get gameid
+            var gameID = gamesList.get(gameNumber - 1).gameID();
+            GameplayUI gameplayUI = new GameplayUI(null, gameID, authToken.authToken(), teamColor, null);
+            WebSocketFacade ws = new WebSocketFacade(facade.getWsUrl(), gameplayUI);
+            gameplayUI.setWs(ws);
+            ws.sendMessage(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken.authToken(), gameID));
+            var scanner = new java.util.Scanner(System.in);
             BoardDrawer drawn = new BoardDrawer();
             var chessGame = new ChessGame();
             drawn.drawBoard(chessGame.getBoard(), teamColor.equals("WHITE"));
+            while (true) {
+                String line = scanner.nextLine();
+                if (gameplayUI.eval(line)) break;
+            }
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -133,16 +147,32 @@ public class PostloginUI {
     }
 
     private void observeGameInfo(int gameNumber) {
-        if (gamesList.isEmpty()) {
-            System.out.println("Please make sure games are available to observe.");
+        try {
+            if (gamesList.isEmpty()) {
+                System.out.println("Please make sure games are available to observe.");
+            }
+            if (gameNumber < 1 || gameNumber > gamesList.size()) {
+                System.out.println("Invalid game number.");
+                return;
+            }
+            var gameID = gamesList.get(gameNumber - 1).gameID();
+            GameplayUI gameplayUI = new GameplayUI(null, gameID, authToken.authToken(), null, null);
+            WebSocketFacade ws = new WebSocketFacade(facade.getWsUrl(), gameplayUI);
+            gameplayUI.setWs(ws);
+            ws.sendMessage(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken.authToken(), gameID));
+            var scanner = new java.util.Scanner(System.in);
+            BoardDrawer drawn = new BoardDrawer();
+            var chessGame = new ChessGame();
+            drawn.drawBoard(chessGame.getBoard(), true);
+            while (true) {
+                String line = scanner.nextLine();
+                if (gameplayUI.eval(line)) break;
+            }
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-        if (gameNumber < 1 || gameNumber > gamesList.size()) {
-            System.out.println("Invalid game number.");
-            return;
-        }
-        BoardDrawer drawn = new BoardDrawer();
-        var chessGame = new ChessGame();
-        drawn.drawBoard(chessGame.getBoard(), true);
+
 
     }
 
