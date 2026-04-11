@@ -1,5 +1,7 @@
 package client;
 
+import chess.ChessBoard;
+import chess.ChessGame;
 import model.*;
 import ui.BoardDrawer;
 public class PostloginUI {
@@ -122,7 +124,8 @@ public class PostloginUI {
         try {
             facade.joinGame(request, authToken);
             BoardDrawer drawn = new BoardDrawer();
-            drawn.drawBoard(teamColor.equals("WHITE"));
+            var chessGame = new ChessGame();
+            drawn.drawBoard(chessGame.getBoard(), teamColor.equals("WHITE"));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -138,7 +141,9 @@ public class PostloginUI {
             return;
         }
         BoardDrawer drawn = new BoardDrawer();
-        drawn.drawBoard(true);
+        var chessGame = new ChessGame();
+        drawn.drawBoard(chessGame.getBoard(), true);
+
     }
 
 }

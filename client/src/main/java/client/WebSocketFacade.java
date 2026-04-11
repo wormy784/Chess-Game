@@ -19,6 +19,7 @@ public class WebSocketFacade {
         session = container.connectToServer(this, URI.create(serverUrl));
     }
 
+
     @OnOpen
     public void onOpen(Session session) {
         this.session = session;
