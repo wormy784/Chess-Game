@@ -2,11 +2,16 @@ package client;
 
 import chess.ChessMove;
 import chess.ChessPosition;
+import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import ui.BoardDrawer;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 public class GameplayUI implements MessageHandler {
     private WebSocketFacade command;
@@ -26,6 +31,23 @@ public class GameplayUI implements MessageHandler {
     @Override
     public void onMessage(String message) {
         // hanlde message from server
+        var gson = new Gson();
+        var serverMessage = gson.fromJson(message, ServerMessage.class);
+        switch (serverMessage.getServerMessageType()) {
+            case LOAD_GAME -> {
+                var loadMessage = gson.fromJson(message, LoadGameMessage.class);
+                currentGame = gson.fromJson(gson.toJson(loadMessage.game), GameData.class);
+                redraw();
+            }
+            case NOTIFICATION -> {
+                var notifMessage = gson.fromJson(message, NotificationMessage.class);
+                System.out.println(notifMessage.message);
+            }
+            case ERROR -> {
+                var errorMessage = gson.fromJson(message, ErrorMessage.class);
+                System.out.println(errorMessage.errorMessage);
+            }
+        }
 
     }
 
@@ -41,7 +63,7 @@ public class GameplayUI implements MessageHandler {
                 leave();
             return true;
             }
-            case "highlight" -> highlight();
+            case "highlight" -> highlight(parts[1]);
             default -> help();
         }
         return false;
@@ -93,8 +115,16 @@ public class GameplayUI implements MessageHandler {
         }
     }
 
-    private void highlight() {
-
+    private void highlight(String location) {
+        try {
+            var newLocation = new ChessPosition(Character.getNumericValue(location.charAt(1)),location.charAt(0) - 'a' + 1);
+            var validMoves = currentGame.game().validMoves(newLocation);
+            for (var move : validMoves) {
+                System.out.println(move.getEndPosition());
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void setWs(WebSocketFacade ws) {

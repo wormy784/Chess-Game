@@ -31,18 +31,16 @@ public class WebSocketHandler {
         this.gameService = gameService;
         this.authDao = authDao;
     }
-    private void onConnect(WsConnectContext context) {
+    public void onConnect(WsConnectContext context) {
 
     }
 
-    private void onMessage(WsMessageContext context) {
+    public void onMessage(WsMessageContext context) {
         // desterialize json into UserGameCommand with gson
         var jsonString = (context.message());
         UserGameCommand command = gson.fromJson(jsonString, UserGameCommand.class);
 
-
-
-        // switch on commandType and route to other methods
+        // switch on command  type and route to other methods
         switch (command.getCommandType()) {
             case CONNECT: handleConnect(context, command);
             break;
@@ -72,6 +70,11 @@ public class WebSocketHandler {
         // send load game message to client
         try {
             var game = gameService.getGame(command.getAuthToken(), command.getGameID());
+            // null check to make sure game is real
+            if (game == null) {
+                context.send(gson.toJson(new ErrorMessage("Error: game not found")));
+                return;
+            }
             var message = new LoadGameMessage(game);
             var json = gson.toJson(message);
             context.send(json);
@@ -92,27 +95,48 @@ public class WebSocketHandler {
 
     private void handleMakeMove(WsMessageContext context, MakeMoveCommand command) {
             try {
-                // verify move
+                // null check
+                var auth = authDao.getAuth(command.getAuthToken());
+                if (auth == null) {
+                    context.send(gson.toJson(new ErrorMessage("Error: unauthorized")));
+                    return;
+                }
+                //check if observer
+                // username dealio
+                var username = authDao.getAuth(command.getAuthToken()).username();
+                var game = gameService.getGame(command.getAuthToken(), command.getGameID());
+                if (!username.equals(game.whiteUsername()) && !username.equals(game.blackUsername())) {
+                    context.send(gson.toJson(new ErrorMessage("Error: observers cannot make moves")));
+                    return;
+                }
+
+                username = auth.username();
+                // dont continue if the game is over broski
+                if (game.game().isGameOver()) {
+                    context.send(gson.toJson(new ErrorMessage("Error: game is over")));
+                    return;
+                }
+
+                // verify move and update it
                 var updatedGame = gameService.makeMove(command.getAuthToken(), command.getGameID(), command.getMove());
                 // update game in database
                 var message = new LoadGameMessage(updatedGame);
                 var json = gson.toJson(message);
-                // username dealio
-                var username = authDao.getAuth(command.getAuthToken()).username();
-                // load game go to all sessions
-                for (WsContext session: gameSessions.get(command.getGameID())) {
-                    session.send(json);
-                }
+
+
                 // send notification to other clients
                 for (WsContext session : gameSessions.get(command.getGameID())) {
+                    // load game go to all sessions
+                    session.send(json);
 
                     var notifMessage = new NotificationMessage(username + "Move Succcess");
                     var notifJson = gson.toJson(notifMessage);
                     // server send Notification message ot all other clients about what move was made
-                    if (session != context) {
+                    if (!session.equals(context)) {
                         session.send(notifJson);
                     }
                 }
+
                 // if move is a check, checkmate or stalemate, server send notification message to all clients
                 // white
                 if (updatedGame.game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
@@ -128,6 +152,7 @@ public class WebSocketHandler {
                         s.send(checkMessage);
                     }
                 }
+
                 // white in check
                 else if (updatedGame.game().isInCheck(ChessGame.TeamColor.WHITE)) {
                     var checkMessage = gson.toJson(new NotificationMessage("White is in check!"));
@@ -167,6 +192,8 @@ public class WebSocketHandler {
         try {
             // remove session from game session
             gameSessions.get(command.getGameID()).remove(context);
+            // remove username from game in db
+            gameService.leaveGame(command.getAuthToken(), command.getGameID());
             // send notif to all other clients that the player left (or rage-quit)
             for (WsContext session : gameSessions.get(command.getGameID())) {
                 var username = authDao.getAuth(command.getAuthToken()).username();
@@ -184,10 +211,24 @@ public class WebSocketHandler {
 
     private void handleResign(WsMessageContext context, UserGameCommand command) {
         try {
-            // mark game as over in db
-            var game = gameService.resignGame(command.getAuthToken(), command.getGameID());
-            // grab username
+            // username dealio
             var username = authDao.getAuth(command.getAuthToken()).username();
+            var game = gameService.getGame(command.getAuthToken(), command.getGameID());
+
+            //check if observer
+            if (!username.equals(game.whiteUsername()) && !username.equals(game.blackUsername())) {
+                context.send(gson.toJson(new ErrorMessage("Error: observers cannot make moves")));
+                return;
+            }
+
+            //check if game is over
+            if (game.game().isGameOver()) {
+                context.send(gson.toJson(new ErrorMessage("Error: game is already over")));
+                return;
+            }
+
+            gameService.resignGame(command.getAuthToken(), command.getGameID());
+
             // send notif to other clients player resigned (mad cuz bad)
             for (WsContext session : gameSessions.get(command.getGameID())) {
 
@@ -201,6 +242,9 @@ public class WebSocketHandler {
         }
 
     }
-    private void onClose(WsCloseContext context) {
+    public void onClose(WsCloseContext context) {
+        for (var sessions : gameSessions.values()) {
+            sessions.remove(context);
+        }
     }
 }

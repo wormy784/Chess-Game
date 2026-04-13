@@ -110,6 +110,33 @@ public class GameService {
         return game;
     }
 
+    public void  leaveGame(String authToken, int gameID) throws DataAccessException {
+        // get auth token
+        var auth = authDao.getAuth(authToken);
+        // check if its null
+        if (auth == null) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+        var game = gameDao.getGame(gameID);
+
+
+
+        if (game == null) {
+            return;
+        }
+        // remove player from slot of color
+        GameData updatedGame;
+        if (auth.username().equals(game.whiteUsername())) {
+            updatedGame = new GameData(gameID, null, game.blackUsername(), game.gameName(), game.game());
+        } else if (auth.username().equals(game.blackUsername())) {
+            updatedGame = new GameData(gameID, game.whiteUsername(), null, game.gameName(), game.game());
+        } else {
+            // observer i think
+            return;
+        }
+        gameDao.updateGame(updatedGame);
+    }
+
     public GameData resignGame(String authToken, int gameID) throws DataAccessException{
         // verify auth token
         var auth = authDao.getAuth(authToken);
