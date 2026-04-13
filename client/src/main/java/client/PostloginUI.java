@@ -1,6 +1,5 @@
 package client;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import model.*;
 import ui.BoardDrawer;
@@ -137,7 +136,9 @@ public class PostloginUI {
             drawn.drawBoard(chessGame.getBoard(), teamColor.equals("WHITE"));
             while (true) {
                 String line = scanner.nextLine();
-                if (gameplayUI.eval(line)) break;
+                if (gameplayUI.eval(line)) {
+                    break;
+                }
             }
 
         } catch (Exception e) {

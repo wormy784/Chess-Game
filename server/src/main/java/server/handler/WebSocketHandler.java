@@ -102,6 +102,7 @@ public class WebSocketHandler {
                     return;
                 }
                 //check if observer
+
                 // username dealio
                 var username = authDao.getAuth(command.getAuthToken()).username();
                 var game = gameService.getGame(command.getAuthToken(), command.getGameID());
@@ -117,6 +118,18 @@ public class WebSocketHandler {
                     return;
                 }
 
+                // check if palyers turn
+                ChessGame.TeamColor playerColor = null;
+                if (username.equals(game.whiteUsername())) {
+                    playerColor = ChessGame.TeamColor.WHITE;
+                } else if (username.equals(game.blackUsername())) {
+                    playerColor = ChessGame.TeamColor.BLACK;
+                }
+                if (playerColor != game.game().getTeamTurn()) {
+                    context.send(gson.toJson(new ErrorMessage("Error: it is not your turn")));
+                    return;
+                }
+
                 // verify move and update it
                 var updatedGame = gameService.makeMove(command.getAuthToken(), command.getGameID(), command.getMove());
                 // update game in database
@@ -124,12 +137,13 @@ public class WebSocketHandler {
                 var json = gson.toJson(message);
 
 
+
                 // send notification to other clients
                 for (WsContext session : gameSessions.get(command.getGameID())) {
                     // load game go to all sessions
                     session.send(json);
 
-                    var notifMessage = new NotificationMessage(username + "Move Succcess");
+                    var notifMessage = new NotificationMessage(username + "Move Success");
                     var notifJson = gson.toJson(notifMessage);
                     // server send Notification message ot all other clients about what move was made
                     if (!session.equals(context)) {

@@ -2,15 +2,15 @@ package ui;
 
 import chess.ChessBoard;
 import chess.ChessGame;
-import chess.ChessPiece;
 import chess.ChessPosition;
 
 public class BoardDrawer {
 
     private String getPiece(ChessBoard board, int row, int col) {
        var piece = board.getPiece(new ChessPosition(row, col));
-       if (piece == null)
+       if (piece == null) {
            return EscapeSequences.EMPTY;
+       }
        return switch (piece.getPieceType()) {
            case ROOK -> piece.getTeamColor() == ChessGame.TeamColor.WHITE ?
                    EscapeSequences.WHITE_ROOK : EscapeSequences.BLACK_ROOK;
