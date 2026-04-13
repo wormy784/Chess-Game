@@ -102,7 +102,6 @@ public class WebSocketHandler {
                     return;
                 }
                 //check if observer
-
                 // username dealio
                 var username = authDao.getAuth(command.getAuthToken()).username();
                 var game = gameService.getGame(command.getAuthToken(), command.getGameID());
@@ -110,14 +109,12 @@ public class WebSocketHandler {
                     context.send(gson.toJson(new ErrorMessage("Error: observers cannot make moves")));
                     return;
                 }
-
                 username = auth.username();
                 // dont continue if the game is over broski
                 if (game.game().isGameOver()) {
                     context.send(gson.toJson(new ErrorMessage("Error: game is over")));
                     return;
                 }
-
                 // check if palyers turn
                 ChessGame.TeamColor playerColor = null;
                 if (username.equals(game.whiteUsername())) {
@@ -129,15 +126,11 @@ public class WebSocketHandler {
                     context.send(gson.toJson(new ErrorMessage("Error: it is not your turn")));
                     return;
                 }
-
                 // verify move and update it
                 var updatedGame = gameService.makeMove(command.getAuthToken(), command.getGameID(), command.getMove());
                 // update game in database
                 var message = new LoadGameMessage(updatedGame);
                 var json = gson.toJson(message);
-
-
-
                 // send notification to other clients
                 for (WsContext session : gameSessions.get(command.getGameID())) {
                     // load game go to all sessions
@@ -150,7 +143,6 @@ public class WebSocketHandler {
                         session.send(notifJson);
                     }
                 }
-
                 // if move is a check, checkmate or stalemate, server send notification message to all clients
                 // white
                 if (updatedGame.game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
@@ -166,7 +158,6 @@ public class WebSocketHandler {
                         s.send(checkMessage);
                     }
                 }
-
                 // white in check
                 else if (updatedGame.game().isInCheck(ChessGame.TeamColor.WHITE)) {
                     var checkMessage = gson.toJson(new NotificationMessage("White is in check!"));
@@ -195,7 +186,6 @@ public class WebSocketHandler {
                         s.send(checkMessage);
                     }
                 }
-
             } catch (DataAccessException | InvalidMoveException e) {
                 context.send(gson.toJson(new ErrorMessage("Error: " + e.getMessage())));
             }

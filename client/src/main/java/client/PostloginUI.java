@@ -167,7 +167,9 @@ public class PostloginUI {
             drawn.drawBoard(chessGame.getBoard(), true);
             while (true) {
                 String line = scanner.nextLine();
-                if (gameplayUI.eval(line)) break;
+                if (gameplayUI.eval(line)) {
+                    break;
+                }
             }
 
         } catch (Exception e) {
